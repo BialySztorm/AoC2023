@@ -133,9 +133,13 @@
   <ItemGroup>
     <ClCompile Include="AoC.cpp" />
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Private\DayHandler.cpp" />
+    <ClCompile Include="Source\Private\FileHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Main.h" />
+    <ClInclude Include="Source\Public\DayHandler.h" />
+    <ClInclude Include="Source\Public\FileHandler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
