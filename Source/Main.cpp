@@ -6,15 +6,15 @@
 
 Main::Main()
 {
+	DayHandler* dayHandler = new DayHandler("Data\\Input\\", "Data\\Output\\");
 	do
 	{
 		Menu();
-		std::cin>>option;
-		DayHandler dayHandler(option);
+		std::cin >> option;
+		dayHandler->HandleDay(option);
 		system("pause");
 		system("cls");
-
-	}while (option > 0);
+	} while (option > 0);
 }
 
 Main::~Main()
@@ -23,6 +23,5 @@ Main::~Main()
 
 void Main::Menu()
 {
-	std::cout<<"Select day 1-24: ";
+	std::cout << "Select day 1-24: ";
 }
-

@@ -9,7 +9,7 @@ FileHandler::FileHandler(std::string inputDir, std::string outputDir)
 
 std::vector<std::string> FileHandler::ReadFile(std::string fileName) const
 {
-	std::ifstream file(inputDir+fileName);
+	std::ifstream file(inputDir + fileName);
 	std::vector<std::string> tab;
 	std::string Line;
 
@@ -26,7 +26,7 @@ std::vector<std::string> FileHandler::ReadFile(std::string fileName) const
 
 bool FileHandler::WriteFile(const std::string fileName, const std::vector<std::string> content)
 {
-	std::ofstream file(outputDir+fileName);
+	std::ofstream file(outputDir + fileName);
 	if (file.is_open())
 	{
 		for (const std::string line : content)
