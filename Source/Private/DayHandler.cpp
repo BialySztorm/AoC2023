@@ -19,6 +19,8 @@ void DayHandler::HandleDay(int day)
 			day1(*fileHandler);
 		else if (day == 2)
 			day2(*fileHandler);
+		else if (day == 3)
+			day3(*fileHandler);
 	}
 }
 
@@ -183,6 +185,212 @@ void DayHandler::day2(FileHandler& fileHandler)
 	std::cout << "Part Two: " << sum << std::endl;
 }
 
+void DayHandler::day3(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day3.txt");
+
+	std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> tmp, tmp1;
+
+	for (int i = 0; i< tab.size(); i++)
+	{
+		bool isNum = false;
+		std::pair<int,int> start, end;
+		for (int j = 0; j < tab[i].length(); j++)
+		{
+			if (isdigit(tab[i][j]) && !isNum)
+			{
+				start = {i,j};
+				isNum = true;
+			}
+			else if(!isdigit(tab[i][j]) && isNum)
+			{
+				end = {i,j-1};
+				isNum = false;
+				tmp.push_back({start,end});
+			}
+		}
+		if (isNum)
+		{
+			end = { i, tab[i].length()-1 };
+			tmp.push_back({ start,end });
+		}
+	}
+	
+	for (std::pair<std::pair<int, int>, std::pair<int, int>> tmp2 : tmp)
+	{
+		int min = tmp2.first.second, max = tmp2.second.second, height = tmp2.first.first;
+		bool isCorrect = false;
+		for (int i = min; i <= max; i++)
+		{
+			if (i > 0 && !isdigit(tab[height][i - 1]) && tab[height][i - 1] != '.')
+			{
+				isCorrect = true;
+				break;
+			}
+			if ( i > 0 && height > 0 && !isdigit(tab[height-1][i - 1]) && tab[height-1][i - 1] != '.')
+			{
+				isCorrect = true;
+				break;
+			}
+			if (height > 0 && !isdigit(tab[height - 1][i]) && tab[height - 1][i] != '.')
+			{
+				isCorrect = true;
+				break;
+			}
+			if (i < tab[height].length()-1 && height > 0 && !isdigit(tab[height - 1][i+1]) && tab[height - 1][i+1] != '.')
+			{
+				isCorrect = true;
+				break;
+			}
+			if (i < tab[height].length()-1 && !isdigit(tab[height][i + 1]) && tab[height][i + 1] != '.')
+			{
+				isCorrect = true;
+				break;
+			}
+			if (i < tab[height].length()-1 && height < tab.size()-1 && !isdigit(tab[height + 1][i + 1]) && tab[height + 1][i + 1] != '.')
+			{
+				isCorrect = true;
+				break;
+			}
+			if (height < tab.size()-1 && !isdigit(tab[height + 1][i]) && tab[height + 1][i] != '.')
+			{
+				isCorrect = true;
+				break;
+			}
+			if (i > 0 && height < tab.size()-1 && !isdigit(tab[height + 1][i - 1]) && tab[height + 1][i - 1] != '.')
+			{
+				isCorrect = true;
+				break;
+			}
+		}
+		if (isCorrect)
+		{
+			tmp1.push_back(tmp2);
+		}
+	}
+	int sum = 0;
+	for (std::pair<std::pair<int, int>, std::pair<int, int>> tmp2 : tmp1)
+	{
+		sum+= std::stoi(tab[tmp2.first.first].substr(tmp2.first.second, tmp2.second.second - tmp2.first.second + 1));
+	}
+
+	std::cout<< "Part One: "<< sum << std::endl;
+
+	std::vector<std::pair<int,int>> gearRatios;
+	for (int i = 0; i < tab.size(); i++)
+		for (int j = 0; j < tab[i].length(); j++)
+			if(tab[i][j] == '*')
+				gearRatios.push_back({i,j});
+
+	int ratioSum = 0;
+	for (std::pair<int, int> gearRatio : gearRatios)
+	{
+		std::pair<int,int> one = {-1,-1}, two = {-1,-1};
+		int i = gearRatio.second, height = gearRatio.first;
+		if (i > 0 && isdigit(tab[height][i - 1]) )
+		{
+			one = {height,i-1};
+		}
+		if (i < tab[height].length() - 1 && isdigit(tab[height][i + 1]))
+		{
+			if (one.first != -1 && one.second != -1)
+			{
+				two = { height,i+1 };
+			}
+			else {
+				one = { height,i+1 };
+			}
+		}
+		if (height > 0 && isdigit(tab[height - 1][i]) && (two.first == -1 && two.second == -1))
+		{
+			if (one.first != -1 && one.second != -1)
+			{
+				two = { height-1,i };
+			}
+			else {
+				one = { height-1,i };
+			}
+		}
+		if (height < tab.size() - 1 && isdigit(tab[height + 1][i]) && (two.first == -1 && two.second == -1))
+		{
+			if (one.first != -1 && one.second != -1)
+			{
+				two = { height+1,i };
+			}
+			else {
+				one = { height+1,i };
+			}
+		}
+		if (i > 0 && height > 0 && isdigit(tab[height - 1][i - 1]) && (two.first == -1 && two.second == -1) && height-1 != one.first)
+		{
+			if (one.first != -1 && one.second != -1)
+			{
+				two = { height - 1,i - 1 };
+			}
+			else {
+				one = { height - 1,i - 1 };
+			}
+		}
+		if (i < tab[height].length() - 1 && height > 0 && isdigit(tab[height - 1][i + 1]) && (two.first == -1 && two.second == -1) && !(height - 1 == one.first  && i == one.second))
+		{
+			if (one.first != -1 && one.second != -1)
+			{
+				two = { height - 1,i + 1 };
+			}
+			else {
+				one = { height - 1,i + 1 };
+			}
+		}
+		if (i < tab[height].length() - 1 && height < tab.size() - 1 && isdigit(tab[height + 1][i + 1]) && (two.first == -1 && two.second == -1) && height + 1 != one.first)
+		{
+			if (one.first != -1 && one.second != -1)
+			{
+				two = { height + 1,i + 1 };
+			}
+			else {
+				one = { height + 1,i + 1 };
+			}
+		}
+		if (i > 0 && height < tab.size() - 1 && isdigit(tab[height + 1][i - 1]) && (two.first == -1 && two.second == -1) && !(height + 1 == one.first && i == one.second))
+		{
+			if (one.first != -1 && one.second != -1)
+			{
+				two = { height + 1,i - 1 };
+			}
+			else {
+				one = { height + 1,i - 1 };
+			}
+		}
+		if((two.first == -1 && two.second == -1))
+			continue;
+		int tmpRatio = 1;
+		for (std::pair<std::pair<int, int>, std::pair<int, int>> tmpTab : tmp)
+		{
+			if (isWithinRange(one, tmpTab))
+			{
+				//std::cout<<tmpTab.first.first<<", "<<tmpTab.first.second<<"; " << tmpTab.second.first << ", " << tmpTab.second.second << " - ";
+				tmpRatio *= std::stoi(tab[tmpTab.first.first].substr(tmpTab.first.second, tmpTab.second.second - tmpTab.first.second + 1));
+				break;
+			}
+		}
+		for (std::pair<std::pair<int, int>, std::pair<int, int>> tmpTab : tmp)
+		{
+			if (isWithinRange(two, tmpTab))
+			{
+				//std::cout << tmpTab.first.first << ", " << tmpTab.first.second << "; " << tmpTab.second.first << ", " << tmpTab.second.second << "\n";
+				tmpRatio *= std::stoi(tab[tmpTab.first.first].substr(tmpTab.first.second, tmpTab.second.second - tmpTab.first.second + 1));
+				break;
+			}
+		}
+		//std::cout<<tmpRatio<<std::endl;
+		
+		ratioSum += tmpRatio;
+	}
+
+	std::cout << "Part Two: " << ratioSum << std::endl;
+
+}
+
 std::vector<std::string> DayHandler::SplitString(const std::string& input, char delimiter)
 {
 	std::vector<std::string> tokens;
@@ -195,3 +403,10 @@ std::vector<std::string> DayHandler::SplitString(const std::string& input, char 
 
 	return tokens;
 }
+
+bool DayHandler::isWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, std::pair<int, int>> range)
+{
+	return (point.first >= range.first.first && point.first <= range.second.first &&
+		point.second >= range.first.second && point.second <= range.second.second);
+}
+
