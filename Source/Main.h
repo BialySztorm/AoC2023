@@ -8,4 +8,5 @@ private:
 	int option = 0;
 
 	void Menu();
+	void Goodbye();
 };

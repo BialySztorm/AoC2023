@@ -100,7 +100,7 @@ void DayHandler::day1(FileHandler& fileHandler)
 		{
 			std::string tmp = numbers;
 			//std::cout<<tmp<<std::endl;
-			std::cout << std::stoi(tmp) << std::endl;
+			//std::cout << std::stoi(tmp) << std::endl;
 			calibrationSum += std::stoi(tmp);
 		}
 		catch (...)
