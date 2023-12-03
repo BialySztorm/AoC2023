@@ -2,8 +2,8 @@
 
 #include <cctype>
 #include <iostream>
-#include <sstream>
 
+#include "CustomLib.h"
 #include "FileHandler.h"
 
 DayHandler::DayHandler(std::string inputDir, std::string outputDir)
@@ -21,6 +21,10 @@ void DayHandler::HandleDay(int day)
 			day2(*fileHandler);
 		else if (day == 3)
 			day3(*fileHandler);
+	}
+	else if (day > currentDay)
+	{
+		std::cout<<"\nWrong day!\n";
 	}
 }
 
@@ -121,11 +125,11 @@ void DayHandler::day2(FileHandler& fileHandler)
 	for (std::string line : tab)
 	{
 		bool fairGame = true;
-		std::vector<std::string> lineTab = SplitString(line, ':');
+		std::vector<std::string> lineTab = CustomLib::SplitString(line, ':');
 		lineTab[1].erase(0, 1);
 		lineTab[1].erase(std::remove_if(lineTab[1].begin(), lineTab[1].end(), [](char c) { return c == ';'; }), lineTab[1].end());
 		lineTab[1].erase(std::remove_if(lineTab[1].begin(), lineTab[1].end(), [](char c) { return c == ','; }), lineTab[1].end());
-		std::vector<std::string> tmp = SplitString(lineTab[1], ' ');
+		std::vector<std::string> tmp = CustomLib::SplitString(lineTab[1], ' ');
 		for (int i = 0; i < tmp.size() / 2; i++)
 		{
 			if (tmp[2 * i + 1] == "blue" && std::stoi(tmp[2 * i]) > 14)
@@ -146,7 +150,7 @@ void DayHandler::day2(FileHandler& fileHandler)
 		}
 		if (fairGame)
 		{
-			int id = std::stoi(SplitString(lineTab[0], ' ')[1]);
+			int id = std::stoi(CustomLib::SplitString(lineTab[0], ' ')[1]);
 			//std::cout<<id<<std::endl;
 			fairGames += id;
 		}
@@ -156,12 +160,12 @@ void DayHandler::day2(FileHandler& fileHandler)
 	int sum = 0;
 	for (std::string line : tab)
 	{
-		line = SplitString(line, ':')[1];
+		line = CustomLib::SplitString(line, ':')[1];
 		line.erase(0, 1);
 		line.erase(std::remove_if(line.begin(), line.end(), [](char c) { return c == ','; }), line.end());
 		line.erase(std::remove_if(line.begin(), line.end(), [](char c) { return c == ';'; }), line.end());
 		int maxR = 1, maxG = 1, maxB = 1;
-		std::vector<std::string> tmp1 = SplitString(line, ' ');
+		std::vector<std::string> tmp1 = CustomLib::SplitString(line, ' ');
 		for (int i = 0; i < tmp1.size() / 2; i++)
 		{
 			if (tmp1[2 * i + 1] == "blue" && std::stoi(tmp1[2 * i]) > maxB)
@@ -366,7 +370,7 @@ void DayHandler::day3(FileHandler& fileHandler)
 		int tmpRatio = 1;
 		for (std::pair<std::pair<int, int>, std::pair<int, int>> tmpTab : tmp)
 		{
-			if (isWithinRange(one, tmpTab))
+			if (CustomLib::isWithinRange(one, tmpTab))
 			{
 				//std::cout<<tmpTab.first.first<<", "<<tmpTab.first.second<<"; " << tmpTab.second.first << ", " << tmpTab.second.second << " - ";
 				tmpRatio *= std::stoi(tab[tmpTab.first.first].substr(tmpTab.first.second, tmpTab.second.second - tmpTab.first.second + 1));
@@ -375,7 +379,7 @@ void DayHandler::day3(FileHandler& fileHandler)
 		}
 		for (std::pair<std::pair<int, int>, std::pair<int, int>> tmpTab : tmp)
 		{
-			if (isWithinRange(two, tmpTab))
+			if (CustomLib::isWithinRange(two, tmpTab))
 			{
 				//std::cout << tmpTab.first.first << ", " << tmpTab.first.second << "; " << tmpTab.second.first << ", " << tmpTab.second.second << "\n";
 				tmpRatio *= std::stoi(tab[tmpTab.first.first].substr(tmpTab.first.second, tmpTab.second.second - tmpTab.first.second + 1));
@@ -389,24 +393,5 @@ void DayHandler::day3(FileHandler& fileHandler)
 
 	std::cout << "Part Two: " << ratioSum << std::endl;
 
-}
-
-std::vector<std::string> DayHandler::SplitString(const std::string& input, char delimiter)
-{
-	std::vector<std::string> tokens;
-	std::stringstream ss(input);
-	std::string token;
-
-	while (std::getline(ss, token, delimiter)) {
-		tokens.push_back(token);
-	}
-
-	return tokens;
-}
-
-bool DayHandler::isWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, std::pair<int, int>> range)
-{
-	return (point.first >= range.first.first && point.first <= range.second.first &&
-		point.second >= range.first.second && point.second <= range.second.second);
 }
 

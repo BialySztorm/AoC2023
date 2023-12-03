@@ -133,11 +133,13 @@
   <ItemGroup>
     <ClCompile Include="AoC.cpp" />
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Private\CustomLib.cpp" />
     <ClCompile Include="Source\Private\DayHandler.cpp" />
     <ClCompile Include="Source\Private\FileHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Main.h" />
+    <ClInclude Include="Source\Public\CustomLib.h" />
     <ClInclude Include="Source\Public\DayHandler.h" />
     <ClInclude Include="Source\Public\FileHandler.h" />
   </ItemGroup>
