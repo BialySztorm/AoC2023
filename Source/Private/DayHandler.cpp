@@ -2,6 +2,7 @@
 
 #include <cctype>
 #include <iostream>
+#include <cmath>
 
 #include "CustomLib.h"
 #include "FileHandler.h"
@@ -21,6 +22,8 @@ void DayHandler::HandleDay(int day)
 			day2(*fileHandler);
 		else if (day == 3)
 			day3(*fileHandler);
+		else if (day == 4)
+			day4(*fileHandler);
 	}
 	else if (day > currentDay)
 	{
@@ -126,7 +129,6 @@ void DayHandler::day2(FileHandler& fileHandler)
 	{
 		bool fairGame = true;
 		std::vector<std::string> lineTab = CustomLib::SplitString(line, ':');
-		lineTab[1].erase(0, 1);
 		lineTab[1].erase(std::remove_if(lineTab[1].begin(), lineTab[1].end(), [](char c) { return c == ';'; }), lineTab[1].end());
 		lineTab[1].erase(std::remove_if(lineTab[1].begin(), lineTab[1].end(), [](char c) { return c == ','; }), lineTab[1].end());
 		std::vector<std::string> tmp = CustomLib::SplitString(lineTab[1], ' ');
@@ -393,5 +395,94 @@ void DayHandler::day3(FileHandler& fileHandler)
 
 	std::cout << "Part Two: " << ratioSum << std::endl;
 
+}
+
+void DayHandler::day4(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day4.txt");
+	std::vector<std::vector<std::string>> tab1;
+	for (std::string tmp : tab)
+	{
+		std::vector<std::string> tmp1 = CustomLib::SplitString(tmp, ':');
+		std::vector<std::string> tmp2 = CustomLib::SplitString(tmp1[1], '|');
+		tmp1[1] = tmp2[0];
+		tmp1.push_back(tmp2[1]);
+		tab1.push_back(tmp1);
+	}
+	int points = 0;
+	for (std::vector<std::string> tmp : tab1)
+	{
+		int multiply = 0;
+		std::vector<int> winningNumbers, myNumbers;
+		for (std::string tmp1 : CustomLib::SplitString(tmp[1],' '))
+		{
+			winningNumbers.push_back(std::stoi(tmp1));
+		}
+		for (std::string tmp1 : CustomLib::SplitString(tmp[2], ' '))
+		{
+			myNumbers.push_back(std::stoi(tmp1));
+		}
+		for (int tmp1 : myNumbers)
+		{
+			for (int tmp2 : winningNumbers)
+			{
+				if (tmp1 == tmp2)
+				{
+					multiply++;
+					break;
+				}
+			}
+		}
+		if (multiply > 0)
+		{
+			points += std::pow(2, multiply - 1);
+		}
+	}
+	std::cout << "Part One: "<< points << std::endl;
+
+	int* scratchcards = new int[tab.size()];
+	for (int i = 0; i < tab.size(); i++)
+	{
+		scratchcards[i] = 1;
+	}
+	int scratchcardsNum = 0;
+	for (int i = 0; i < tab.size(); i++)
+	{
+		if(scratchcards[i] != NULL)
+			scratchcardsNum += scratchcards[i];
+		//std::cout << i << ", " << scratchcards[i] << std::endl;
+		int tmp = 0;
+		int cards = 0;
+		std::vector<int> winningNumbers, myNumbers;
+		for (std::string tmp1 : CustomLib::SplitString(tab1[i][1], ' '))
+		{
+			winningNumbers.push_back(std::stoi(tmp1));
+		}
+		for (std::string tmp1 : CustomLib::SplitString(tab1[i][2], ' '))
+		{
+			myNumbers.push_back(std::stoi(tmp1));
+		}
+		for (int tmp1 : myNumbers)
+		{
+			for (int tmp2 : winningNumbers)
+			{
+				if (tmp1 == tmp2)
+				{
+					cards++;
+					break;
+				}
+			}
+		}
+		for (int j = 1; j < cards +1; j++)
+		{
+			if (i + j < tab.size())
+			{
+				scratchcards[i + j]+= scratchcards[i];
+			}
+		}
+
+	}
+	delete[] scratchcards;
+	std::cout << "Part Two: " << scratchcardsNum<< std::endl;
 }
 

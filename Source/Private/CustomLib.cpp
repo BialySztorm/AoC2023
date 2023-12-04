@@ -8,7 +8,8 @@ std::vector<std::string> CustomLib::SplitString(const std::string& input, char d
 	std::string token;
 
 	while (std::getline(ss, token, delimiter)) {
-		tokens.push_back(token);
+		if(!token.empty())
+			tokens.push_back(token);
 	}
 
 	return tokens;
