@@ -1,13 +1,13 @@
 #include "FileHandler.h"
 #include <fstream>
 
-FileHandler::FileHandler(std::string inputDir, std::string outputDir)
+FileHandler::FileHandler(const std::string inputDir, const std::string outputDir)
 {
 	this->inputDir = inputDir;
 	this->outputDir = outputDir;
 }
 
-std::vector<std::string> FileHandler::ReadFile(std::string fileName) const
+std::vector<std::string> FileHandler::ReadFile(const std::string fileName) const
 {
 	std::ifstream file(inputDir + fileName);
 	std::vector<std::string> tab;
@@ -24,7 +24,7 @@ std::vector<std::string> FileHandler::ReadFile(std::string fileName) const
 	return tab;
 }
 
-bool FileHandler::WriteFile(const std::string fileName, const std::vector<std::string> content)
+bool FileHandler::WriteFile(const std::string fileName, const std::vector<std::string> content) const
 {
 	std::ofstream file(outputDir + fileName);
 	if (file.is_open())

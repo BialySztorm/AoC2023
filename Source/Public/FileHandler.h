@@ -9,8 +9,8 @@ private:
 	std::string outputDir;
 
 public:
-	FileHandler(std::string inputDir, std::string outputDir);
+	FileHandler(const std::string inputDir, const std::string outputDir);
 
-	std::vector<std::string> ReadFile(std::string fileName) const;
-	bool WriteFile(const std::string fileName, const std::vector<std::string> content);
+	std::vector<std::string> ReadFile(const std::string fileName) const;
+	bool WriteFile(const std::string fileName, const std::vector<std::string> content) const;
 };

@@ -9,7 +9,7 @@ Main::Main()
 	DayHandler* dayHandler = new DayHandler("Data\\Input\\", "Data\\Output\\");
 	do
 	{
-		Menu();
+		Menu(dayHandler->getCurrentDay());
 		std::cin >> option;
 		if(option <= 0 || option > 25)
 		{
@@ -27,8 +27,9 @@ Main::~Main()
 {
 }
 
-void Main::Menu()
+void Main::Menu(const int day)
 {
+	
 	std::cout << " _______     _                                   ___    _______          _       " << std::endl;
 	std::cout << "(_______)   | |                   _             / __)  (_______)        | |      " << std::endl;
 	std::cout << " _______  __| |_   _ _____ ____ _| |_     ___ _| |__    _       ___   __| |_____ " << std::endl;
@@ -36,7 +37,7 @@ void Main::Menu()
 	std::cout << "| |   | ( (_| |\\ V /| ____| | | || |_   | |_| || |     | |____| |_| ( (_| | ____|" << std::endl;
 	std::cout << "|_|   |_|\\____| \\_/ |_____)_| |_| \\__)   \\___/ |_|      \\______)___/ \\____|_____)" << std::endl;
 	std::cout << "                                                                   by WhiteStorm "<< std::endl;
-	std::cout << "\n\nSelect Day from 1-24, or 0 to end the program: ";
+	std::cout << "\n\nSelect Day from 1-" << day << ", or 0 to end the program: ";
 }
 
 void Main::Goodbye()

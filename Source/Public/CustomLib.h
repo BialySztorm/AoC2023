@@ -6,13 +6,13 @@
 class CustomLib
 {
 public:
-	static std::vector<std::string> SplitString(const std::string& input, char delimiter);
-	static bool IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, std::pair<int, int>> range);
+	static std::vector<std::string> SplitString(const std::string& input, const char delimiter);
+	static bool IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, const std::pair<int, int>> range);
 	template <typename T>
 	static std::vector<T> VectorStringToNumber(const std::vector<std::string>& stringVector);
 	static bool IsNumber(const std::string& s);
 private:
-	static void PushError(std::string e);
+	static void PushError(const std::string e);
 };
 
 template<typename T>

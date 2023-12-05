@@ -7,6 +7,6 @@ public:
 private:
 	int option = 0;
 
-	void Menu();
+	void Menu(const int day);
 	void Goodbye();
 };

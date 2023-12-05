@@ -11,27 +11,29 @@
 DayHandler::DayHandler(std::string inputDir, std::string outputDir)
 {
 	fileHandler = new FileHandler(inputDir, outputDir);
+	dayFunctions.emplace_back(&DayHandler::Day1);
+	dayFunctions.emplace_back(&DayHandler::Day2);
+	dayFunctions.emplace_back(&DayHandler::Day3);
+	dayFunctions.emplace_back(&DayHandler::Day4);
+	dayFunctions.emplace_back(&DayHandler::Day5);
+	currentDay = dayFunctions.size();
 }
 
 void DayHandler::HandleDay(int day)
 {
 	if (day <= currentDay && day > 0)
 	{
-		if (day == 1)
-			Day1(*fileHandler);
-		else if (day == 2)
-			Day2(*fileHandler);
-		else if (day == 3)
-			Day3(*fileHandler);
-		else if (day == 4)
-			Day4(*fileHandler);
-		else if (day == 5)
-			Day5(*fileHandler);
+		(this->*dayFunctions[day-1])(*fileHandler);
 	}
-	else if (day > currentDay)
+	else
 	{
-		std::cout<<"\nWrong day!\n";
+		std::cout << "\nWrong day!\n";
 	}
+}
+
+int DayHandler::getCurrentDay()
+{
+	return currentDay;
 }
 
 void DayHandler::Day1(FileHandler& fileHandler)
