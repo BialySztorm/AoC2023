@@ -3,6 +3,7 @@
 #include <cctype>
 #include <iostream>
 #include <cmath>
+#include <thread>
 
 #include "CustomLib.h"
 #include "FileHandler.h"
@@ -17,13 +18,15 @@ void DayHandler::HandleDay(int day)
 	if (day <= currentDay && day > 0)
 	{
 		if (day == 1)
-			day1(*fileHandler);
+			Day1(*fileHandler);
 		else if (day == 2)
-			day2(*fileHandler);
+			Day2(*fileHandler);
 		else if (day == 3)
-			day3(*fileHandler);
+			Day3(*fileHandler);
 		else if (day == 4)
-			day4(*fileHandler);
+			Day4(*fileHandler);
+		else if (day == 5)
+			Day5(*fileHandler);
 	}
 	else if (day > currentDay)
 	{
@@ -31,7 +34,7 @@ void DayHandler::HandleDay(int day)
 	}
 }
 
-void DayHandler::day1(FileHandler& fileHandler)
+void DayHandler::Day1(FileHandler& fileHandler)
 {
 	std::vector<std::string> tab = fileHandler.ReadFile("day1.txt");
 
@@ -120,7 +123,7 @@ void DayHandler::day1(FileHandler& fileHandler)
 	std::cout << "Part Two: " << calibrationSum << std::endl;
 }
 
-void DayHandler::day2(FileHandler& fileHandler)
+void DayHandler::Day2(FileHandler& fileHandler)
 {
 	std::vector<std::string> tab = fileHandler.ReadFile("day2.txt");
 
@@ -191,7 +194,7 @@ void DayHandler::day2(FileHandler& fileHandler)
 	std::cout << "Part Two: " << sum << std::endl;
 }
 
-void DayHandler::day3(FileHandler& fileHandler)
+void DayHandler::Day3(FileHandler& fileHandler)
 {
 	std::vector<std::string> tab = fileHandler.ReadFile("day3.txt");
 
@@ -372,7 +375,7 @@ void DayHandler::day3(FileHandler& fileHandler)
 		int tmpRatio = 1;
 		for (std::pair<std::pair<int, int>, std::pair<int, int>> tmpTab : tmp)
 		{
-			if (CustomLib::isWithinRange(one, tmpTab))
+			if (CustomLib::IsWithinRange(one, tmpTab))
 			{
 				//std::cout<<tmpTab.first.first<<", "<<tmpTab.first.second<<"; " << tmpTab.second.first << ", " << tmpTab.second.second << " - ";
 				tmpRatio *= std::stoi(tab[tmpTab.first.first].substr(tmpTab.first.second, tmpTab.second.second - tmpTab.first.second + 1));
@@ -381,7 +384,7 @@ void DayHandler::day3(FileHandler& fileHandler)
 		}
 		for (std::pair<std::pair<int, int>, std::pair<int, int>> tmpTab : tmp)
 		{
-			if (CustomLib::isWithinRange(two, tmpTab))
+			if (CustomLib::IsWithinRange(two, tmpTab))
 			{
 				//std::cout << tmpTab.first.first << ", " << tmpTab.first.second << "; " << tmpTab.second.first << ", " << tmpTab.second.second << "\n";
 				tmpRatio *= std::stoi(tab[tmpTab.first.first].substr(tmpTab.first.second, tmpTab.second.second - tmpTab.first.second + 1));
@@ -397,7 +400,7 @@ void DayHandler::day3(FileHandler& fileHandler)
 
 }
 
-void DayHandler::day4(FileHandler& fileHandler)
+void DayHandler::Day4(FileHandler& fileHandler)
 {
 	std::vector<std::string> tab = fileHandler.ReadFile("day4.txt");
 	std::vector<std::vector<std::string>> tab1;
@@ -486,3 +489,109 @@ void DayHandler::day4(FileHandler& fileHandler)
 	std::cout << "Part Two: " << scratchcardsNum<< std::endl;
 }
 
+void DayHandler::Day5(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day5.txt");
+	std::vector<long long> seeds = CustomLib::VectorStringToNumber<long long>(CustomLib::SplitString(CustomLib::SplitString(tab[0], ':')[1], ' '));
+	std::vector<int> seedsLevel;
+	for (int i = 0; i < seeds.size(); i++)
+		seedsLevel.push_back(0);
+	int currentLevel = 0, seedsUnderLevel = 0;
+	for (int i = 1; i < tab.size(); i++)
+	{
+		if (tab[i] == "")
+		{
+			i += 2;
+			for (int i = 0; i < seedsLevel.size(); i++)
+			{
+				seedsLevel[i] = currentLevel;
+			}
+			currentLevel++;
+			seedsUnderLevel = seeds.size();
+			//std::cout << currentLevel << std::endl;
+		}
+		else if (!seedsUnderLevel)
+			continue;
+		std::vector<long long> map = CustomLib::VectorStringToNumber<long long>(CustomLib::SplitString(tab[i], ' '));
+		long long maxRange = map[1] + map[2] - 1;
+		for (int j = 0; j < seeds.size(); j++)
+		{
+			if (seedsLevel[j] < currentLevel && seeds[j] >= map[1] && seeds[j] <= maxRange)
+			{
+				seeds[j] += map[0] - map[1];
+				seedsLevel[j]++;
+				seedsUnderLevel--;
+			}
+		}
+	}
+
+	std::cout << "Part One: " << *std::min_element(seeds.begin(), seeds.end()) << std::endl;
+
+	seeds = CustomLib::VectorStringToNumber<long long>(CustomLib::SplitString(CustomLib::SplitString(tab[0], ':')[1], ' '));
+
+	std::vector<std::vector<std::vector<long long>>> mappings;
+
+	{
+		std::vector <std::vector<long long>> tmp;
+		for (int i = 1; i < tab.size(); i++)
+		{
+			if (tab[i] == "")
+			{
+				if (i != 1)
+				{
+					mappings.push_back(tmp);
+					tmp.clear();
+				}
+				i += 2;
+			}
+			tmp.push_back(CustomLib::VectorStringToNumber<long long>(CustomLib::SplitString(tab[i], ' ')));
+		}
+		mappings.push_back(tmp);
+	}
+	std::vector<long long> locations;
+
+	for (size_t i = 0; i < seeds.size(); i += 2) {
+		long long seedStart = seeds[i];
+		long long seedSize = seeds[i + 1];
+		std::vector<std::pair<long long, long long>> tmp = { { seedStart, seedStart + seedSize } };
+		for (std::vector<std::vector<long long>> mapping : mappings)
+		{
+			tmp = (Day5ApplyRange(tmp, mapping));
+		}
+		locations.push_back((*std::min_element(tmp.begin(), tmp.end())).first);
+	}
+
+	std::cout << "Part Two: " << *std::min_element(locations.begin(), locations.end()) << std::endl;
+
+}
+
+std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(std::vector<std::pair<long long, long long>> tab, std::vector<std::vector<long long>> mapping)
+{
+	std::vector<std::pair<long long, long long>> tmp;
+	for (int i = 0; i < mapping.size(); i++)
+	{
+		long long destination = mapping[i][0];
+		long long source = mapping[i][1];
+		long long size = mapping[i][2];
+		long long sourceEnd = source + size;
+		std::vector<std::pair<long long, long long>> newTab;
+		while (tab.size())
+		{
+			std::pair<long long,long long>& tmp1 = tab.back();
+			tab.pop_back();
+			std::pair<long long, long long> before = { tmp1.first, std::min(tmp1.second, source)};
+			std::pair<long long, long long> inter = { std::max(tmp1.first, source), std::min(sourceEnd, tmp1.second) };
+			std::pair<long long, long long> after = { std::max(sourceEnd, tmp1.first), tmp1.second };
+			if (before.second > before.first)
+				newTab.push_back(before);
+			if (inter.second > inter.first)
+				tmp.push_back({ inter.first - source + destination, inter.second - source + destination });
+			if (after.second > after.first)
+				newTab.push_back(after);
+
+		}
+		tab = newTab;
+	}
+	tmp.insert(tmp.end(), tab.begin(), tab.end());
+	return tmp;
+}
