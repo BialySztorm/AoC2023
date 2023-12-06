@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include <thread>
+#include <numeric>
 
 #include "CustomLib.h"
 #include "FileHandler.h"
@@ -16,6 +17,7 @@ DayHandler::DayHandler(std::string inputDir, std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day3);
 	dayFunctions.emplace_back(&DayHandler::Day4);
 	dayFunctions.emplace_back(&DayHandler::Day5);
+	dayFunctions.emplace_back(&DayHandler::Day6);
 	currentDay = dayFunctions.size();
 }
 
@@ -564,6 +566,46 @@ void DayHandler::Day5(FileHandler& fileHandler)
 	}
 
 	std::cout << "Part Two: " << *std::min_element(locations.begin(), locations.end()) << std::endl;
+
+}
+
+void DayHandler::Day6(FileHandler& fileHandler) {
+	std::vector<std::string> tab = fileHandler.ReadFile("day6.txt");
+	std::vector<int> times = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tab[0], ' ', {0}));
+	std::vector<int> distances = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tab[1], ' ', {0}));
+	int margin = 1;
+	for (int i = 0; i < times.size(); i++)
+	{
+		int currentMargin = 0;
+		for (int j = 1; j < times[i]; j++)
+		{
+			if((times[i]-j)*j > distances[i])
+				currentMargin++;
+		}
+		if(margin > 0);
+			margin *= currentMargin;
+	}
+
+	std::cout << "Part One: " << margin << std::endl;
+
+	long long time = std::stoll(std::accumulate(times.begin(), times.end(), std::string(),
+		[](const std::string& a, int b) {
+			return a + std::to_string(b);
+		}));
+
+	long long distance = std::stoll(std::accumulate(distances.begin(), distances.end(), std::string(),
+		[](const std::string& a, int b) {
+			return a + std::to_string(b);
+		}));
+
+	int newMargin = 0;
+	for (int j = 1; j < time; j++)
+	{
+		if ((time - j) * j > distance)
+			newMargin++;
+	}
+
+	std::cout << "Part Two: " << newMargin << std::endl;
 
 }
 

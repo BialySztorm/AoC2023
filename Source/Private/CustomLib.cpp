@@ -16,6 +16,19 @@ std::vector<std::string> CustomLib::SplitString(const std::string& input, const 
 	return tokens;
 }
 
+std::vector<std::string> CustomLib::SplitString(const std::string& input, const char delimiter, const std::vector<int> unnecesaryColumns)
+{
+	std::vector<std::string> tmp = SplitString(input, delimiter);
+	for (int i : unnecesaryColumns)
+	{
+		if (i < 0)
+			tmp.erase(tmp.end() + i);
+		else
+			tmp.erase(tmp.begin() + i);
+	}
+	return tmp;
+}
+
 bool CustomLib::IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, const std::pair<int, int>> range)
 {
 	return (point.first >= range.first.first && point.first <= range.second.first &&

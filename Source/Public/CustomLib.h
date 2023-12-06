@@ -7,10 +7,11 @@ class CustomLib
 {
 public:
 	static std::vector<std::string> SplitString(const std::string& input, const char delimiter);
+	static std::vector<std::string> SplitString(const std::string& input, const char delimiter, const std::vector<int> unnecesaryColumns);
 	static bool IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, const std::pair<int, int>> range);
+	static bool IsNumber(const std::string& s);
 	template <typename T>
 	static std::vector<T> VectorStringToNumber(const std::vector<std::string>& stringVector);
-	static bool IsNumber(const std::string& s);
 private:
 	static void PushError(const std::string e);
 };
