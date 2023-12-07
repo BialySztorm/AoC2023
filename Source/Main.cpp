@@ -20,26 +20,9 @@ Main::Main()
 		system("pause");
 		system("cls");
 	} while (option > 0);
-	Goodbye();
 }
 
 Main::~Main()
-{
-}
-
-void Main::Menu(const int day)
-{
-	std::cout << " _______     _                                   ___    _______          _       " << std::endl;
-	std::cout << "(_______)   | |                   _             / __)  (_______)        | |      " << std::endl;
-	std::cout << " _______  __| |_   _ _____ ____ _| |_     ___ _| |__    _       ___   __| |_____ " << std::endl;
-	std::cout << "|  ___  |/ _  | | | | ___ |  _ (_   _)   / _ (_   __)  | |     / _ \\ / _  | ___ |" << std::endl;
-	std::cout << "| |   | ( (_| |\\ V /| ____| | | || |_   | |_| || |     | |____| |_| ( (_| | ____|" << std::endl;
-	std::cout << "|_|   |_|\\____| \\_/ |_____)_| |_| \\__)   \\___/ |_|      \\______)___/ \\____|_____)" << std::endl;
-	std::cout << "                                                                   by WhiteStorm " << std::endl;
-	std::cout << "\n\nSelect Day from 1-" << day << ", or 0 to end the program: ";
-}
-
-void Main::Goodbye()
 {
 	std::cout << "                       * Happy Christmas! *\n\n";
 	std::cout << "                                 |L   " << std::endl;
@@ -59,4 +42,16 @@ void Main::Goodbye()
 	std::cout << "                       /..-(_)' |','..-`(_)-`" << std::endl;
 	std::cout << "                                |  |        " << std::endl;
 	std::cout << "                              --'  `--" << std::endl;
+}
+
+void Main::Menu(const int day)
+{
+	std::cout << " _______     _                                   ___    _______          _       " << std::endl;
+	std::cout << "(_______)   | |                   _             / __)  (_______)        | |      " << std::endl;
+	std::cout << " _______  __| |_   _ _____ ____ _| |_     ___ _| |__    _       ___   __| |_____ " << std::endl;
+	std::cout << "|  ___  |/ _  | | | | ___ |  _ (_   _)   / _ (_   __)  | |     / _ \\ / _  | ___ |" << std::endl;
+	std::cout << "| |   | ( (_| |\\ V /| ____| | | || |_   | |_| || |     | |____| |_| ( (_| | ____|" << std::endl;
+	std::cout << "|_|   |_|\\____| \\_/ |_____)_| |_| \\__)   \\___/ |_|      \\______)___/ \\____|_____)" << std::endl;
+	std::cout << "                                                                   by WhiteStorm " << std::endl;
+	std::cout << "\n\nSelect Day from 1-" << day << ", or 0 to end the program: ";
 }

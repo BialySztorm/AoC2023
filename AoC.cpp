@@ -3,4 +3,5 @@
 int main()
 {
 	Main* obj = new Main();
+	delete(obj);
 }
