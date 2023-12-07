@@ -24,7 +24,9 @@ private:
 	void Day4(FileHandler& fileHandler);
 	void Day5(FileHandler& fileHandler);
 	void Day6(FileHandler& fileHandler);
+	void Day7(FileHandler& fileHandler);
 
 	// Additional day functions
 	std::vector<std::pair<long long, long long>> Day5ApplyRange(std::vector<std::pair<long long, long long>> tab, std::vector<std::vector<long long>> mapping);
+	int Day7GetType(std::string type, bool activeJokers = false) const;
 };

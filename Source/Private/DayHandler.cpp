@@ -18,6 +18,7 @@ DayHandler::DayHandler(std::string inputDir, std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day4);
 	dayFunctions.emplace_back(&DayHandler::Day5);
 	dayFunctions.emplace_back(&DayHandler::Day6);
+	dayFunctions.emplace_back(&DayHandler::Day7);
 	currentDay = dayFunctions.size();
 }
 
@@ -25,7 +26,7 @@ void DayHandler::HandleDay(int day)
 {
 	if (day <= currentDay && day > 0)
 	{
-		(this->*dayFunctions[day-1])(*fileHandler);
+		(this->*dayFunctions[day - 1])(*fileHandler);
 	}
 	else
 	{
@@ -204,31 +205,31 @@ void DayHandler::Day3(FileHandler& fileHandler)
 
 	std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> tmp, tmp1;
 
-	for (int i = 0; i< tab.size(); i++)
+	for (int i = 0; i < tab.size(); i++)
 	{
 		bool isNum = false;
-		std::pair<int,int> start, end;
+		std::pair<int, int> start, end;
 		for (int j = 0; j < tab[i].length(); j++)
 		{
 			if (isdigit(tab[i][j]) && !isNum)
 			{
-				start = {i,j};
+				start = { i,j };
 				isNum = true;
 			}
-			else if(!isdigit(tab[i][j]) && isNum)
+			else if (!isdigit(tab[i][j]) && isNum)
 			{
-				end = {i,j-1};
+				end = { i,j - 1 };
 				isNum = false;
-				tmp.push_back({start,end});
+				tmp.push_back({ start,end });
 			}
 		}
 		if (isNum)
 		{
-			end = { i, tab[i].length()-1 };
+			end = { i, tab[i].length() - 1 };
 			tmp.push_back({ start,end });
 		}
 	}
-	
+
 	for (std::pair<std::pair<int, int>, std::pair<int, int>> tmp2 : tmp)
 	{
 		int min = tmp2.first.second, max = tmp2.second.second, height = tmp2.first.first;
@@ -240,7 +241,7 @@ void DayHandler::Day3(FileHandler& fileHandler)
 				isCorrect = true;
 				break;
 			}
-			if ( i > 0 && height > 0 && !isdigit(tab[height-1][i - 1]) && tab[height-1][i - 1] != '.')
+			if (i > 0 && height > 0 && !isdigit(tab[height - 1][i - 1]) && tab[height - 1][i - 1] != '.')
 			{
 				isCorrect = true;
 				break;
@@ -250,27 +251,27 @@ void DayHandler::Day3(FileHandler& fileHandler)
 				isCorrect = true;
 				break;
 			}
-			if (i < tab[height].length()-1 && height > 0 && !isdigit(tab[height - 1][i+1]) && tab[height - 1][i+1] != '.')
+			if (i < tab[height].length() - 1 && height > 0 && !isdigit(tab[height - 1][i + 1]) && tab[height - 1][i + 1] != '.')
 			{
 				isCorrect = true;
 				break;
 			}
-			if (i < tab[height].length()-1 && !isdigit(tab[height][i + 1]) && tab[height][i + 1] != '.')
+			if (i < tab[height].length() - 1 && !isdigit(tab[height][i + 1]) && tab[height][i + 1] != '.')
 			{
 				isCorrect = true;
 				break;
 			}
-			if (i < tab[height].length()-1 && height < tab.size()-1 && !isdigit(tab[height + 1][i + 1]) && tab[height + 1][i + 1] != '.')
+			if (i < tab[height].length() - 1 && height < tab.size() - 1 && !isdigit(tab[height + 1][i + 1]) && tab[height + 1][i + 1] != '.')
 			{
 				isCorrect = true;
 				break;
 			}
-			if (height < tab.size()-1 && !isdigit(tab[height + 1][i]) && tab[height + 1][i] != '.')
+			if (height < tab.size() - 1 && !isdigit(tab[height + 1][i]) && tab[height + 1][i] != '.')
 			{
 				isCorrect = true;
 				break;
 			}
-			if (i > 0 && height < tab.size()-1 && !isdigit(tab[height + 1][i - 1]) && tab[height + 1][i - 1] != '.')
+			if (i > 0 && height < tab.size() - 1 && !isdigit(tab[height + 1][i - 1]) && tab[height + 1][i - 1] != '.')
 			{
 				isCorrect = true;
 				break;
@@ -284,57 +285,57 @@ void DayHandler::Day3(FileHandler& fileHandler)
 	int sum = 0;
 	for (std::pair<std::pair<int, int>, std::pair<int, int>> tmp2 : tmp1)
 	{
-		sum+= std::stoi(tab[tmp2.first.first].substr(tmp2.first.second, tmp2.second.second - tmp2.first.second + 1));
+		sum += std::stoi(tab[tmp2.first.first].substr(tmp2.first.second, tmp2.second.second - tmp2.first.second + 1));
 	}
 
-	std::cout<< "Part One: "<< sum << std::endl;
+	std::cout << "Part One: " << sum << std::endl;
 
-	std::vector<std::pair<int,int>> gearRatios;
+	std::vector<std::pair<int, int>> gearRatios;
 	for (int i = 0; i < tab.size(); i++)
 		for (int j = 0; j < tab[i].length(); j++)
-			if(tab[i][j] == '*')
-				gearRatios.push_back({i,j});
+			if (tab[i][j] == '*')
+				gearRatios.push_back({ i,j });
 
 	int ratioSum = 0;
 	for (std::pair<int, int> gearRatio : gearRatios)
 	{
-		std::pair<int,int> one = {-1,-1}, two = {-1,-1};
+		std::pair<int, int> one = { -1,-1 }, two = { -1,-1 };
 		int i = gearRatio.second, height = gearRatio.first;
-		if (i > 0 && isdigit(tab[height][i - 1]) )
+		if (i > 0 && isdigit(tab[height][i - 1]))
 		{
-			one = {height,i-1};
+			one = { height,i - 1 };
 		}
 		if (i < tab[height].length() - 1 && isdigit(tab[height][i + 1]))
 		{
 			if (one.first != -1 && one.second != -1)
 			{
-				two = { height,i+1 };
+				two = { height,i + 1 };
 			}
 			else {
-				one = { height,i+1 };
+				one = { height,i + 1 };
 			}
 		}
 		if (height > 0 && isdigit(tab[height - 1][i]) && (two.first == -1 && two.second == -1))
 		{
 			if (one.first != -1 && one.second != -1)
 			{
-				two = { height-1,i };
+				two = { height - 1,i };
 			}
 			else {
-				one = { height-1,i };
+				one = { height - 1,i };
 			}
 		}
 		if (height < tab.size() - 1 && isdigit(tab[height + 1][i]) && (two.first == -1 && two.second == -1))
 		{
 			if (one.first != -1 && one.second != -1)
 			{
-				two = { height+1,i };
+				two = { height + 1,i };
 			}
 			else {
-				one = { height+1,i };
+				one = { height + 1,i };
 			}
 		}
-		if (i > 0 && height > 0 && isdigit(tab[height - 1][i - 1]) && (two.first == -1 && two.second == -1) && height-1 != one.first)
+		if (i > 0 && height > 0 && isdigit(tab[height - 1][i - 1]) && (two.first == -1 && two.second == -1) && height - 1 != one.first)
 		{
 			if (one.first != -1 && one.second != -1)
 			{
@@ -344,7 +345,7 @@ void DayHandler::Day3(FileHandler& fileHandler)
 				one = { height - 1,i - 1 };
 			}
 		}
-		if (i < tab[height].length() - 1 && height > 0 && isdigit(tab[height - 1][i + 1]) && (two.first == -1 && two.second == -1) && !(height - 1 == one.first  && i == one.second))
+		if (i < tab[height].length() - 1 && height > 0 && isdigit(tab[height - 1][i + 1]) && (two.first == -1 && two.second == -1) && !(height - 1 == one.first && i == one.second))
 		{
 			if (one.first != -1 && one.second != -1)
 			{
@@ -374,7 +375,7 @@ void DayHandler::Day3(FileHandler& fileHandler)
 				one = { height + 1,i - 1 };
 			}
 		}
-		if((two.first == -1 && two.second == -1))
+		if ((two.first == -1 && two.second == -1))
 			continue;
 		int tmpRatio = 1;
 		for (std::pair<std::pair<int, int>, std::pair<int, int>> tmpTab : tmp)
@@ -396,12 +397,11 @@ void DayHandler::Day3(FileHandler& fileHandler)
 			}
 		}
 		//std::cout<<tmpRatio<<std::endl;
-		
+
 		ratioSum += tmpRatio;
 	}
 
 	std::cout << "Part Two: " << ratioSum << std::endl;
-
 }
 
 void DayHandler::Day4(FileHandler& fileHandler)
@@ -421,7 +421,7 @@ void DayHandler::Day4(FileHandler& fileHandler)
 	{
 		int multiply = 0;
 		std::vector<int> winningNumbers, myNumbers;
-		for (std::string tmp1 : CustomLib::SplitString(tmp[1],' '))
+		for (std::string tmp1 : CustomLib::SplitString(tmp[1], ' '))
 		{
 			winningNumbers.push_back(std::stoi(tmp1));
 		}
@@ -445,7 +445,7 @@ void DayHandler::Day4(FileHandler& fileHandler)
 			points += std::pow(2, multiply - 1);
 		}
 	}
-	std::cout << "Part One: "<< points << std::endl;
+	std::cout << "Part One: " << points << std::endl;
 
 	int* scratchcards = new int[tab.size()];
 	for (int i = 0; i < tab.size(); i++)
@@ -455,7 +455,7 @@ void DayHandler::Day4(FileHandler& fileHandler)
 	int scratchcardsNum = 0;
 	for (int i = 0; i < tab.size(); i++)
 	{
-		if(scratchcards[i] != NULL)
+		if (scratchcards[i] != NULL)
 			scratchcardsNum += scratchcards[i];
 		//std::cout << i << ", " << scratchcards[i] << std::endl;
 		int tmp = 0;
@@ -480,17 +480,16 @@ void DayHandler::Day4(FileHandler& fileHandler)
 				}
 			}
 		}
-		for (int j = 1; j < cards +1; j++)
+		for (int j = 1; j < cards + 1; j++)
 		{
 			if (i + j < tab.size())
 			{
-				scratchcards[i + j]+= scratchcards[i];
+				scratchcards[i + j] += scratchcards[i];
 			}
 		}
-
 	}
 	delete[] scratchcards;
-	std::cout << "Part Two: " << scratchcardsNum<< std::endl;
+	std::cout << "Part Two: " << scratchcardsNum << std::endl;
 }
 
 void DayHandler::Day5(FileHandler& fileHandler)
@@ -566,24 +565,23 @@ void DayHandler::Day5(FileHandler& fileHandler)
 	}
 
 	std::cout << "Part Two: " << *std::min_element(locations.begin(), locations.end()) << std::endl;
-
 }
 
 void DayHandler::Day6(FileHandler& fileHandler) {
 	std::vector<std::string> tab = fileHandler.ReadFile("day6.txt");
-	std::vector<int> times = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tab[0], ' ', {0}));
-	std::vector<int> distances = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tab[1], ' ', {0}));
+	std::vector<int> times = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tab[0], ' ', { 0 }));
+	std::vector<int> distances = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tab[1], ' ', { 0 }));
 	int margin = 1;
 	for (int i = 0; i < times.size(); i++)
 	{
 		int currentMargin = 0;
 		for (int j = 1; j < times[i]; j++)
 		{
-			if((times[i]-j)*j > distances[i])
+			if ((times[i] - j) * j > distances[i])
 				currentMargin++;
 		}
-		if(margin > 0);
-			margin *= currentMargin;
+		if (margin > 0);
+		margin *= currentMargin;
 	}
 
 	std::cout << "Part One: " << margin << std::endl;
@@ -606,7 +604,51 @@ void DayHandler::Day6(FileHandler& fileHandler) {
 	}
 
 	std::cout << "Part Two: " << newMargin << std::endl;
+}
 
+void DayHandler::Day7(FileHandler& fileHandler) {
+	std::vector<std::string> tab = fileHandler.ReadFile("day7.txt");
+	std::vector<std::pair<std::string, int>> players;
+	for (std::string element : tab)
+	{
+		std::vector<std::string> tmp = CustomLib::SplitString(element, ' ');
+		players.push_back({ tmp[0], std::stoi(tmp[1]) });
+	}
+	std::vector<std::vector<std::pair<int, std::string>>> types = { {},{},{},{},{},{},{} };
+	for (int i = 0; i < players.size(); i++)
+	{
+		int type = Day7GetType(players[i].first);
+		types[type - 1].push_back({ i, players[i].first });
+	}
+	int size = 0;
+	long long money = 0;
+	for (std::vector<std::pair<int, std::string>> tmp : types)
+	{
+		std::vector<std::pair<int, std::string>> tmp1 = tmp;
+		CustomLib::QuickSort(tmp1, 0, decltype(0)(tmp1.size() - 1), false, CustomLib::Day7Compare<decltype(tmp1)::value_type>);
+		for (std::pair<int, std::string> player : tmp1)
+			money += players[player.first].second * ++size;
+	}
+
+	std::cout << "Part One: " << money << std::endl;
+
+	types = { {},{},{},{},{},{},{} };
+	for (int i = 0; i < players.size(); i++)
+	{
+		int type = Day7GetType(players[i].first, true);
+		types[type - 1].push_back({ i, players[i].first });
+	}
+	size = 0;
+	money = 0;
+	for (std::vector<std::pair<int, std::string>> tmp : types)
+	{
+		std::vector<std::pair<int, std::string>> tmp1 = tmp;
+		CustomLib::QuickSort(tmp1, 0, decltype(0)(tmp1.size() - 1), true, CustomLib::Day7Compare<decltype(tmp1)::value_type>);
+		for (std::pair<int, std::string> player : tmp1)
+			money += players[player.first].second * ++size;
+	}
+
+	std::cout << "Part Two: " << money << std::endl;
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(std::vector<std::pair<long long, long long>> tab, std::vector<std::vector<long long>> mapping)
@@ -621,9 +663,9 @@ std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(std::vec
 		std::vector<std::pair<long long, long long>> newTab;
 		while (tab.size())
 		{
-			std::pair<long long,long long>& tmp1 = tab.back();
+			std::pair<long long, long long>& tmp1 = tab.back();
 			tab.pop_back();
-			std::pair<long long, long long> before = { tmp1.first, std::min(tmp1.second, source)};
+			std::pair<long long, long long> before = { tmp1.first, std::min(tmp1.second, source) };
 			std::pair<long long, long long> inter = { std::max(tmp1.first, source), std::min(sourceEnd, tmp1.second) };
 			std::pair<long long, long long> after = { std::max(sourceEnd, tmp1.first), tmp1.second };
 			if (before.second > before.first)
@@ -632,10 +674,114 @@ std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(std::vec
 				tmp.push_back({ inter.first - source + destination, inter.second - source + destination });
 			if (after.second > after.first)
 				newTab.push_back(after);
-
 		}
 		tab = newTab;
 	}
 	tmp.insert(tmp.end(), tab.begin(), tab.end());
 	return tmp;
+}
+
+int DayHandler::Day7GetType(std::string type, bool activeJokers) const
+{
+	std::vector<char> labels, repeatingLabels;
+	int repeats = 0;
+	for (char tmp : type)
+	{
+		bool isInLabels = false;
+		for (char tmp1 : labels)
+		{
+			if (tmp1 == tmp)
+			{
+				repeats += 1;
+				isInLabels = true;
+				break;
+			}
+		}
+		if (!isInLabels)
+		{
+			labels.push_back(tmp);
+		}
+		else
+		{
+			bool isInRepeatingLabels = false;
+			for (char tmp1 : repeatingLabels)
+			{
+				if (tmp1 == tmp)
+				{
+					isInRepeatingLabels = true;
+					break;
+				}
+			}
+			if (!isInRepeatingLabels)
+			{
+				repeatingLabels.push_back(tmp);
+				repeats++;
+			}
+		}
+	}
+	if (activeJokers)
+	{
+		if (repeatingLabels.size() > 1)
+		{
+			if (repeatingLabels[0] == 'J')
+				repeatingLabels.erase(repeatingLabels.begin());
+			else if (repeatingLabels[1] == 'J')
+				repeatingLabels.erase(repeatingLabels.begin() + 1);
+			else
+			{
+				for (char tmp : type)
+				{
+					if (tmp == 'J')
+					{
+						repeats++;
+						break;
+					}
+				}
+			}
+		}
+		else if (repeatingLabels.size() > 0)
+		{
+			if (repeatingLabels[0] == 'J')
+			{
+				if (repeats < 5)
+					repeats++;
+			}
+			else if (repeats < 5)
+			{
+				for (char tmp : type)
+				{
+					if (tmp == 'J')
+					{
+						repeats++;
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			for (char tmp : type)
+			{
+				if (tmp == 'J')
+				{
+					repeats += 2;
+					repeatingLabels.push_back(tmp);
+					break;
+				}
+			}
+		}
+	}
+	if (repeats == 5 && repeatingLabels.size() == 1)
+		return 7;
+	else if (repeats == 4 && repeatingLabels.size() == 1)
+		return 6;
+	else if (repeats == 5 && repeatingLabels.size() == 2)
+		return 5;
+	else if (repeats == 3 && repeatingLabels.size() == 1)
+		return 4;
+	else if (repeats == 4 && repeatingLabels.size() == 2)
+		return 3;
+	else if (repeats == 2 && repeatingLabels.size() == 1)
+		return 2;
+	return 1;
 }

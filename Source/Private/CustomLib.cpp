@@ -9,7 +9,7 @@ std::vector<std::string> CustomLib::SplitString(const std::string& input, const 
 	std::string token;
 
 	while (std::getline(ss, token, delimiter)) {
-		if(!token.empty())
+		if (!token.empty())
 			tokens.push_back(token);
 	}
 

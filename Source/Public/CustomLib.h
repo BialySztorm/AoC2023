@@ -24,7 +24,6 @@ public:
 	static bool Day7Compare(T a, T b, bool type);
 	template <typename T, typename U, typename CompareFunction>
 	static void QuickSort(std::vector<T>& arr, U low, U high, bool type = false, CompareFunction compare = Compare<T>);
-
 };
 
 template<typename T>
@@ -82,8 +81,8 @@ inline bool CustomLib::Day7Compare(T a, T b, bool type)
 }
 
 template<>
-inline bool CustomLib::Day7Compare<std::pair<int,std::string>>(std::pair<int, std::string> a, std::pair<int, std::string> b, bool type)
-{	
+inline bool CustomLib::Day7Compare<std::pair<int, std::string>>(std::pair<int, std::string> a, std::pair<int, std::string> b, bool type)
+{
 	std::map<char, int> cardValues;
 	if (!type)
 	{
