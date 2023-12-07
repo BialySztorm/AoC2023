@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <map>
 
 class CustomLib
 {
@@ -14,6 +15,16 @@ public:
 	static std::vector<T> VectorStringToNumber(const std::vector<std::string>& stringVector);
 private:
 	static void PushError(const std::string e);
+	template <typename T, typename U, typename CompareFunction>
+	static U Partition(std::vector<T>& arr, U low, U high, bool type, CompareFunction compare);
+	template <typename T>
+	static bool Compare(T a, T b, bool type);
+public:
+	template <typename T>
+	static bool Day7Compare(T a, T b, bool type);
+	template <typename T, typename U, typename CompareFunction>
+	static void QuickSort(std::vector<T>& arr, U low, U high, bool type = false, CompareFunction compare = Compare<T>);
+
 };
 
 template<typename T>
@@ -45,4 +56,94 @@ inline std::vector<T> CustomLib::VectorStringToNumber(const std::vector<std::str
 		}
 	}
 	return convertedVector;
+}
+
+template<typename T, typename U, typename CompareFunction>
+inline void CustomLib::QuickSort(std::vector<T>& arr, U low, U high, bool type, CompareFunction compare)
+{
+	if (low < high) {
+		U pi = Partition(arr, low, high, type, compare);
+
+		QuickSort(arr, low, pi - 1, type, compare);
+		QuickSort(arr, pi + 1, high, type, compare);
+	}
+}
+
+template<typename T>
+inline bool CustomLib::Compare(T a, T b, bool type)
+{
+	return a < b;
+}
+
+template<typename T>
+inline bool CustomLib::Day7Compare(T a, T b, bool type)
+{
+	return false;
+}
+
+template<>
+inline bool CustomLib::Day7Compare<std::pair<int,std::string>>(std::pair<int, std::string> a, std::pair<int, std::string> b, bool type)
+{	
+	std::map<char, int> cardValues;
+	if (!type)
+	{
+		cardValues = {
+		{'2', 2},
+		{'3', 3},
+		{'4', 4},
+		{'5', 5},
+		{'6', 6},
+		{'7', 7},
+		{'8', 8},
+		{'9', 9},
+		{'T', 10},
+		{'J', 11},
+		{'Q', 12},
+		{'K', 13},
+		{'A', 14}
+		};
+	}
+	else
+	{
+		cardValues = {
+		{'J', 1},
+		{'2', 2},
+		{'3', 3},
+		{'4', 4},
+		{'5', 5},
+		{'6', 6},
+		{'7', 7},
+		{'8', 8},
+		{'9', 9},
+		{'T', 10},
+		{'Q', 11},
+		{'K', 12},
+		{'A', 13}
+		};
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		if (cardValues[a.second[i]] < cardValues[b.second[i]])
+			return true;
+		else if (cardValues[a.second[i]] > cardValues[b.second[i]])
+			return false;
+	}
+	return false;
+}
+
+template<typename T, typename U, typename CompareFunction>
+inline U CustomLib::Partition(std::vector<T>& arr, U low, U high, bool type, CompareFunction compare)
+{
+	T pivot = arr[high];
+	U i = low - 1;
+
+	for (U j = low; j <= high - 1; j++) {
+		if (compare(arr[j], pivot, type)) {
+			i++;
+			std::swap(arr[i], arr[j]);
+		}
+	}
+
+	std::swap(arr[i + 1], arr[high]);
+	return i + 1;
 }
