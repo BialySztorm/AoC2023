@@ -8,13 +8,16 @@ class CustomLib
 {
 public:
 	static std::vector<std::string> SplitString(const std::string& input, const char delimiter);
-	static std::vector<std::string> SplitString(const std::string& input, const char delimiter, const std::vector<int> unnecesaryColumns);
+	static std::vector<std::string> SplitString(const std::string& input, const char delimiter, std::vector<int> unnecesaryColumns);
+	static std::vector<std::string> SplitString(const std::string& input, const std::vector<char> delimiters);
+	static std::vector<std::string> SplitString(const std::string& input, const std::vector<char> delimiters, std::vector<int> unnecesaryColumns);
 	static bool IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, const std::pair<int, int>> range);
 	static bool IsNumber(const std::string& s);
 	template <typename T>
 	static std::vector<T> VectorStringToNumber(const std::vector<std::string>& stringVector);
 private:
 	static void PushError(const std::string e);
+	static bool StringSplitCompare(const int a, const int b);
 	template <typename T, typename U, typename CompareFunction>
 	static U Partition(std::vector<T>& arr, U low, U high, bool type, CompareFunction compare);
 	template <typename T>

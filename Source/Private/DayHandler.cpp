@@ -138,10 +138,7 @@ void DayHandler::Day2(FileHandler& fileHandler)
 	for (std::string line : tab)
 	{
 		bool fairGame = true;
-		std::vector<std::string> lineTab = CustomLib::SplitString(line, ':');
-		lineTab[1].erase(std::remove_if(lineTab[1].begin(), lineTab[1].end(), [](char c) { return c == ';'; }), lineTab[1].end());
-		lineTab[1].erase(std::remove_if(lineTab[1].begin(), lineTab[1].end(), [](char c) { return c == ','; }), lineTab[1].end());
-		std::vector<std::string> tmp = CustomLib::SplitString(lineTab[1], ' ');
+		std::vector<std::string> tmp = CustomLib::SplitString(line, { ' ', ':', ';', ',' }, { 0, 1 });
 		for (int i = 0; i < tmp.size() / 2; i++)
 		{
 			if (tmp[2 * i + 1] == "blue" && std::stoi(tmp[2 * i]) > 14)
@@ -162,7 +159,7 @@ void DayHandler::Day2(FileHandler& fileHandler)
 		}
 		if (fairGame)
 		{
-			int id = std::stoi(CustomLib::SplitString(lineTab[0], ' ')[1]);
+			int id = std::stoi(CustomLib::SplitString(line, { ' ', ':', ';', ',' })[1]);
 			//std::cout<<id<<std::endl;
 			fairGames += id;
 		}
@@ -412,10 +409,7 @@ void DayHandler::Day4(FileHandler& fileHandler)
 	std::vector<std::vector<std::string>> tab1;
 	for (std::string tmp : tab)
 	{
-		std::vector<std::string> tmp1 = CustomLib::SplitString(tmp, ':');
-		std::vector<std::string> tmp2 = CustomLib::SplitString(tmp1[1], '|');
-		tmp1[1] = tmp2[0];
-		tmp1.push_back(tmp2[1]);
+		std::vector<std::string> tmp1 = CustomLib::SplitString(tmp, {':','|'});
 		tab1.push_back(tmp1);
 	}
 	int points = 0;
@@ -661,11 +655,7 @@ void DayHandler::Day8(FileHandler& fileHandler)
 
 	for (int i = 2; i < tab.size(); i++)
 	{
-		tab[i].erase(std::remove(tab[i].begin(), tab[i].end(), '='), tab[i].end());
-		tab[i].erase(std::remove(tab[i].begin(), tab[i].end(), ','), tab[i].end());
-		tab[i].erase(std::remove(tab[i].begin(), tab[i].end(), '('), tab[i].end());
-		tab[i].erase(std::remove(tab[i].begin(), tab[i].end(), ')'), tab[i].end());
-		std::vector<std::string> tmp = CustomLib::SplitString(tab[i], ' ');
+		std::vector<std::string> tmp = CustomLib::SplitString(tab[i], {'=','(',',',')',' '});
 		map[tmp[0]] = { tmp[1],tmp[2] };
 	}
 
@@ -701,7 +691,7 @@ void DayHandler::Day8(FileHandler& fileHandler)
 	for (int i = 0; i < currents.size(); i++)
 	{
 		current = currents[i];
-		std::cout << current << " - ";
+		//std::cout << current << " - ";
 		step = 0;
 		while (current[2] != 'Z')
 		{
@@ -716,7 +706,7 @@ void DayHandler::Day8(FileHandler& fileHandler)
 			}
 			step++;
 		}
-		std::cout << step << std::endl;
+		//std::cout << step << std::endl;
 		stepsProduct = (step * stepsProduct) / std::gcd(step, stepsProduct);
 	}
 
