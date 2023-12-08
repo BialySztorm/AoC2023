@@ -169,12 +169,8 @@ void DayHandler::Day2(FileHandler& fileHandler)
 	int sum = 0;
 	for (std::string line : tab)
 	{
-		line = CustomLib::SplitString(line, ':')[1];
-		line.erase(0, 1);
-		line.erase(std::remove_if(line.begin(), line.end(), [](char c) { return c == ','; }), line.end());
-		line.erase(std::remove_if(line.begin(), line.end(), [](char c) { return c == ';'; }), line.end());
 		int maxR = 1, maxG = 1, maxB = 1;
-		std::vector<std::string> tmp1 = CustomLib::SplitString(line, ' ');
+		std::vector<std::string> tmp1 = CustomLib::SplitString(line, { ' ', ':', ';', ',' }, { 0, 1 });
 		for (int i = 0; i < tmp1.size() / 2; i++)
 		{
 			if (tmp1[2 * i + 1] == "blue" && std::stoi(tmp1[2 * i]) > maxB)
