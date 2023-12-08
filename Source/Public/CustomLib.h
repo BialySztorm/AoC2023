@@ -17,7 +17,6 @@ public:
 	static std::vector<T> VectorStringToNumber(const std::vector<std::string>& stringVector);
 private:
 	static void PushError(const std::string e);
-	static bool StringSplitCompare(const int a, const int b);
 	template <typename T, typename U, typename CompareFunction>
 	static U Partition(std::vector<T>& arr, U low, U high, bool type, CompareFunction compare);
 	template <typename T>

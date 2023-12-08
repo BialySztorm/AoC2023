@@ -19,7 +19,7 @@ std::vector<std::string> CustomLib::SplitString(const std::string& input, const 
 std::vector<std::string> CustomLib::SplitString(const std::string& input, const char delimiter, std::vector<int> unnecesaryColumns)
 {
 	std::vector<std::string> tmp = SplitString(input, delimiter);
-	std::sort(unnecesaryColumns.begin(), unnecesaryColumns.end(), StringSplitCompare);
+	std::sort(unnecesaryColumns.begin(), unnecesaryColumns.end(), [](int a, int b) { return (a >= 0 && b >= 0) ? a < b : a > b; });
 	for (int i : unnecesaryColumns)
 	{
 		if (i < 0)
@@ -32,14 +32,14 @@ std::vector<std::string> CustomLib::SplitString(const std::string& input, const 
 
 std::vector<std::string> CustomLib::SplitString(const std::string& input, const std::vector<char> delimiters)
 {
-	std::vector<std::string> tmp = {input};
+	std::vector<std::string> tmp = { input };
 	for (char delimiter : delimiters)
 	{
 		std::vector<std::string> tmp1;
 		for (std::string tmp2 : tmp)
 		{
 			std::vector<std::string> tmp3 = SplitString(tmp2, delimiter);
-			tmp1.insert(tmp1.end(),tmp3.begin(),tmp3.end());
+			tmp1.insert(tmp1.end(), tmp3.begin(), tmp3.end());
 		}
 		tmp = tmp1;
 	}
@@ -49,7 +49,7 @@ std::vector<std::string> CustomLib::SplitString(const std::string& input, const 
 std::vector<std::string> CustomLib::SplitString(const std::string& input, const std::vector<char> delimiters, std::vector<int> unnecesaryColumns)
 {
 	std::vector<std::string> tmp = SplitString(input, delimiters);
-	std::sort(unnecesaryColumns.begin(), unnecesaryColumns.end(), StringSplitCompare);
+	std::sort(unnecesaryColumns.begin(), unnecesaryColumns.end(), [](int a, int b) { return (a >= 0 && b >= 0) ? a > b : a < b; });
 	for (int i : unnecesaryColumns)
 	{
 		if (i < 0)
@@ -74,9 +74,4 @@ bool CustomLib::IsNumber(const std::string& s)
 void CustomLib::PushError(const std::string e)
 {
 	std::cerr << e << std::endl;
-}
-
-bool CustomLib::StringSplitCompare(const int a, const int b)
-{
-	return (a > 0 && b > 0) ? a < b : a > b;
 }

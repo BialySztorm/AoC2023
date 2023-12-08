@@ -409,7 +409,7 @@ void DayHandler::Day4(FileHandler& fileHandler)
 	std::vector<std::vector<std::string>> tab1;
 	for (std::string tmp : tab)
 	{
-		std::vector<std::string> tmp1 = CustomLib::SplitString(tmp, {':','|'});
+		std::vector<std::string> tmp1 = CustomLib::SplitString(tmp, { ':','|' });
 		tab1.push_back(tmp1);
 	}
 	int points = 0;
@@ -655,7 +655,7 @@ void DayHandler::Day8(FileHandler& fileHandler)
 
 	for (int i = 2; i < tab.size(); i++)
 	{
-		std::vector<std::string> tmp = CustomLib::SplitString(tab[i], {'=','(',',',')',' '});
+		std::vector<std::string> tmp = CustomLib::SplitString(tab[i], { '=','(',',',')',' ' });
 		map[tmp[0]] = { tmp[1],tmp[2] };
 	}
 
