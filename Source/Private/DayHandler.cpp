@@ -5,6 +5,7 @@
 #include <cmath>
 #include <thread>
 #include <numeric>
+#include <unordered_map>
 
 #include "CustomLib.h"
 #include "FileHandler.h"
@@ -19,6 +20,7 @@ DayHandler::DayHandler(std::string inputDir, std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day5);
 	dayFunctions.emplace_back(&DayHandler::Day6);
 	dayFunctions.emplace_back(&DayHandler::Day7);
+	dayFunctions.emplace_back(&DayHandler::Day8);
 	currentDay = dayFunctions.size();
 }
 
@@ -649,6 +651,76 @@ void DayHandler::Day7(FileHandler& fileHandler) {
 	}
 
 	std::cout << "Part Two: " << money << std::endl;
+}
+
+void DayHandler::Day8(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day8.txt");
+	std::string route = tab[0];
+	std::unordered_map<std::string, std::pair<std::string, std::string>> map;
+
+	for (int i = 2; i < tab.size(); i++)
+	{
+		tab[i].erase(std::remove(tab[i].begin(), tab[i].end(), '='), tab[i].end());
+		tab[i].erase(std::remove(tab[i].begin(), tab[i].end(), ','), tab[i].end());
+		tab[i].erase(std::remove(tab[i].begin(), tab[i].end(), '('), tab[i].end());
+		tab[i].erase(std::remove(tab[i].begin(), tab[i].end(), ')'), tab[i].end());
+		std::vector<std::string> tmp = CustomLib::SplitString(tab[i], ' ');
+		map[tmp[0]] = { tmp[1],tmp[2] };
+	}
+
+	std::string current = "AAA";
+	int step = 0;
+	while (current != "ZZZ")
+	{
+		char direction = route[step % route.size()];
+		if (direction == 'L')
+		{
+			current = map[current].first;
+		}
+		else
+		{
+			current = map[current].second;
+		}
+		step++;
+	}
+
+	std::cout << "Part One: " << step << std::endl;
+
+	std::vector<std::string> currents;
+	long long stepsProduct = 1;
+	step = 0;
+
+	for (const auto& entry : map) {
+		const std::string& key = entry.first;
+		if (!key.empty() && key.back() == 'A') {
+			currents.push_back(key);
+		}
+	}
+
+	for (int i = 0; i < currents.size(); i++)
+	{
+		current = currents[i];
+		std::cout << current << " - ";
+		step = 0;
+		while (current[2] != 'Z')
+		{
+			char direction = route[step % route.size()];
+			if (direction == 'L')
+			{
+				current = map[current].first;
+			}
+			else
+			{
+				current = map[current].second;
+			}
+			step++;
+		}
+		std::cout << step << std::endl;
+		stepsProduct = (step * stepsProduct) / std::gcd(step, stepsProduct);
+	}
+
+	std::cout << "Part Two: " << stepsProduct << std::endl;
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(std::vector<std::pair<long long, long long>> tab, std::vector<std::vector<long long>> mapping)
