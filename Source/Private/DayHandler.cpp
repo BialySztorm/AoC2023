@@ -21,6 +21,7 @@ DayHandler::DayHandler(std::string inputDir, std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day6);
 	dayFunctions.emplace_back(&DayHandler::Day7);
 	dayFunctions.emplace_back(&DayHandler::Day8);
+	dayFunctions.emplace_back(&DayHandler::Day9);
 	currentDay = dayFunctions.size();
 }
 
@@ -707,6 +708,38 @@ void DayHandler::Day8(FileHandler& fileHandler)
 	}
 
 	std::cout << "Part Two: " << stepsProduct << std::endl;
+}
+
+void DayHandler::Day9(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day9.txt");
+	/*int testSum = 0;
+	testSum += CustomLib::Extrapolation<int>({0,3,6,9,12,15},false);
+	testSum += CustomLib::Extrapolation<int>({ 1,3,6,10,15,21 },false);
+	testSum += CustomLib::Extrapolation<int>({ 10,13,16,21,30,45 },false);
+
+	std::cout << "Test: " << testSum << std::endl;*/
+	long long sum = 0;
+	//int size = tab.size(), i = 0;
+	for (std::string line : tab)
+	{
+		std::vector<long long> tmp = CustomLib::VectorStringToNumber<long long>(CustomLib::SplitString(line, ' '));
+		long long tmp1 = CustomLib::Extrapolation<long long>(tmp);
+		sum += tmp1;
+		//std::cout << ++i << "/" << size << " - " <<sum<<", " << tmp1 << std::endl;
+	}
+	std::cout << "Part One: " << sum << std::endl;
+
+	sum = 0;
+	for (std::string line : tab)
+	{
+		std::vector<long long> tmp = CustomLib::VectorStringToNumber<long long>(CustomLib::SplitString(line, ' '));
+		long long tmp1 = CustomLib::Extrapolation<long long>(tmp, false);
+		sum += tmp1;
+		//std::cout << ++i << "/" << size << " - " <<sum<<", " << tmp1 << std::endl;
+	}
+
+	std::cout << "Part Two: " << sum << std::endl;
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(std::vector<std::pair<long long, long long>> tab, std::vector<std::vector<long long>> mapping)

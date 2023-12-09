@@ -21,11 +21,15 @@ private:
 	static U Partition(std::vector<T>& arr, U low, U high, bool type, CompareFunction compare);
 	template <typename T>
 	static bool Compare(T a, T b, bool type);
+	template <typename T>
+	static bool CheckTab(const std::vector<T> tab);
 public:
 	template <typename T>
 	static bool Day7Compare(T a, T b, bool type);
 	template <typename T, typename U, typename CompareFunction>
 	static void QuickSort(std::vector<T>& arr, U low, U high, bool type = false, CompareFunction compare = Compare<T>);
+	template <typename T>
+	static int Extrapolation(const std::vector<T>& values, const bool direction = true);
 };
 
 template<typename T>
@@ -74,6 +78,15 @@ template<typename T>
 inline bool CustomLib::Compare(T a, T b, bool type)
 {
 	return a < b;
+}
+
+template<typename T>
+inline bool CustomLib::CheckTab(const std::vector<T> tab)
+{
+	for (T element : tab)
+		if (element != 0)
+			return true;
+	return false;
 }
 
 template<typename T>
@@ -147,4 +160,52 @@ inline U CustomLib::Partition(std::vector<T>& arr, U low, U high, bool type, Com
 
 	std::swap(arr[i + 1], arr[high]);
 	return i + 1;
+}
+
+template<typename T>
+inline int CustomLib::Extrapolation(const std::vector<T>& values, const bool direction)
+{
+	std::vector<std::vector<T>> tab;
+	tab.push_back(values);
+
+	while (CheckTab<T>(tab[tab.size() - 1]))
+	{
+		std::vector<T> tmp;
+		long long index = tab.size() - 1;
+		for (long long i = 0; i < tab[index].size() - 1; i++)
+		{
+			tmp.push_back(tab[index][i + 1] - tab[index][i]);
+		}
+		tab.push_back(tmp);
+	}
+	tab[tab.size() - 1].push_back(0);
+
+	if (direction)
+	{
+		for (long long i = tab.size() - 2; i >= 0; i--)
+		{
+			tab[i].push_back(tab[i + 1][tab[i + 1].size() - 1] + tab[i][tab[i].size() - 1]);
+		}
+		return tab[0][tab[0].size() - 1];
+	}
+	else
+	{
+		for (long long i = tab.size() - 2; i >= 0; i--)
+		{
+			tab[i].insert(tab[i].begin(), (tab[i][0] - tab[i + 1][0]));
+		}
+		return tab[0][0];
+	}
+	/*for (std::vector<T> tmp : tab)
+	{
+		std::string tmp2 = "";
+		for (T tmp1 : tmp)
+		{
+			tmp2 += std::to_string(tmp1) + ", ";
+		}
+		PushError(tmp2);
+	}
+	PushError("");*/
+
+	return 0;
 }
