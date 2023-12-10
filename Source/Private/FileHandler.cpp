@@ -38,3 +38,22 @@ bool FileHandler::WriteFile(const std::string fileName, const std::vector<std::s
 	}
 	return false;
 }
+
+bool FileHandler::WriteFile(const std::string fileName, const std::vector<std::vector<char>> content) const
+{
+	std::ofstream file(outputDir + fileName);
+	if (file.is_open())
+	{
+		for (const std::vector<char> line : content)
+		{
+			for (const char ch : line)
+			{
+				file << ch;
+			}
+			file << std::endl;
+		}
+		file.close();
+		return true;
+	}
+	return false;
+}
