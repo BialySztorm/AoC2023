@@ -22,6 +22,7 @@ DayHandler::DayHandler(std::string inputDir, std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day7);
 	dayFunctions.emplace_back(&DayHandler::Day8);
 	dayFunctions.emplace_back(&DayHandler::Day9);
+	dayFunctions.emplace_back(&DayHandler::Day10);
 	currentDay = dayFunctions.size();
 }
 
@@ -742,6 +743,214 @@ void DayHandler::Day9(FileHandler& fileHandler)
 	std::cout << "Part Two: " << sum << std::endl;
 }
 
+void DayHandler::Day10(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day10.txt");
+	std::vector<std::string> map;
+	for (int i = 0; i < tab.size() * 3; i++)
+	{
+		std::string tmp = "";
+		for (int j = 0; j < tab[0].length() * 3; j++)
+			tmp += ".";
+		map.push_back(tmp);
+	}
+	std::pair<int, int> sLocation = { -1,-1 };
+	for (int i = 0; i < tab.size(); i++)
+	{
+		for (int j = 0; j < tab[i].length(); j++)
+		{
+			if (tab[i][j] == 'S')
+			{
+				sLocation = { i,j };
+				break;
+			}
+		}
+		if (sLocation.first != -1)
+			break;
+	}
+	int pipesCurrrentValue = 1;
+	std::vector<std::pair<int, int>> pipesCurrrentLocations;
+	std::pair<std::vector<std::pair<int, int>>, std::vector<std::pair<int, int>>> Locations;
+	std::vector<std::pair<int, int>> pipesPreviousLocations = { {sLocation.first,sLocation.second},{sLocation.first,sLocation.second} };
+	if (tab[sLocation.first - 1][sLocation.second] == '|' || tab[sLocation.first - 1][sLocation.second] == '7' || tab[sLocation.first - 1][sLocation.second] == 'F')
+		pipesCurrrentLocations.push_back({ sLocation.first - 1 ,sLocation.second });
+	if (tab[sLocation.first][sLocation.second + 1] == '-' || tab[sLocation.first][sLocation.second + 1] == '7' || tab[sLocation.first][sLocation.second + 1] == 'J')
+		pipesCurrrentLocations.push_back({ sLocation.first ,sLocation.second + 1 });
+	if (tab[sLocation.first + 1][sLocation.second] == '|' || tab[sLocation.first + 1][sLocation.second] == 'L' || tab[sLocation.first + 1][sLocation.second] == 'J')
+		pipesCurrrentLocations.push_back({ sLocation.first + 1,sLocation.second });
+	if (tab[sLocation.first][sLocation.second - 1] == '-' || tab[sLocation.first][sLocation.second - 1] == 'L' || tab[sLocation.first][sLocation.second - 1] == 'F')
+		pipesCurrrentLocations.push_back({ sLocation.first ,sLocation.second - 1 });
+
+	map[sLocation.first * 3 + 1][sLocation.second * 3 + 1] = 'S';
+	map[sLocation.first * 3][sLocation.second * 3 + 1] = 'O';
+	map[sLocation.first * 3 + 1][sLocation.second * 3] = 'O';
+	map[sLocation.first * 3 + 2][sLocation.second * 3 + 1] = 'O';
+	map[sLocation.first * 3 + 1][sLocation.second * 3 + 2] = 'O';
+
+
+	for (std::pair<int, int> pipeCurrentLocation : pipesCurrrentLocations)
+	{
+		//map[pipeCurrentLocation.first][pipeCurrentLocation.second] = tab[pipeCurrentLocation.first][pipeCurrentLocation.second];
+		if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == '|')
+		{
+			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
+			map[pipeCurrentLocation.first * 3][pipeCurrentLocation.second * 3 + 1] = 'O';
+			map[pipeCurrentLocation.first * 3 + 2][pipeCurrentLocation.second * 3 + 1] = 'O';
+		}
+		else if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == '-')
+		{
+			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
+			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3] = 'O';
+			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 2] = 'O';
+		}
+		else if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == 'L')
+		{
+			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
+			map[pipeCurrentLocation.first * 3][pipeCurrentLocation.second * 3 + 1] = 'O';
+			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 2] = 'O';
+
+		}
+		else if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == 'J')
+		{
+			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
+			map[pipeCurrentLocation.first * 3][pipeCurrentLocation.second * 3 + 1] = 'O';
+			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3] = 'O';
+		}
+		else if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == 'F')
+		{
+			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
+			map[pipeCurrentLocation.first * 3 + 2][pipeCurrentLocation.second * 3 + 1] = 'O';
+			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 2] = 'O';
+		}
+		else if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == '7')
+		{
+			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
+			map[pipeCurrentLocation.first * 3 + 2][pipeCurrentLocation.second * 3 + 1] = 'O';
+			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3] = 'O';
+		}
+	}
+
+	while (true)
+	{
+		if (!Day10HandlePipe(&pipesPreviousLocations[0], &pipesCurrrentLocations[0], tab))
+		{
+			std::cout << "Wrong data!\n";
+			break;
+		}
+		if (!Day10HandlePipe(&pipesPreviousLocations[1], &pipesCurrrentLocations[1], tab))
+		{
+			std::cout << "Wrong data!\n";
+			break;
+		}
+		for (std::pair<int, int> pipeCurrentLocation : pipesCurrrentLocations)
+		{
+			//map[pipeCurrentLocation.first][pipeCurrentLocation.second] = tab[pipeCurrentLocation.first][pipeCurrentLocation.second];
+			if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == '|')
+			{
+				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
+				map[pipeCurrentLocation.first * 3][pipeCurrentLocation.second * 3 + 1] = 'O';
+				map[pipeCurrentLocation.first * 3 + 2][pipeCurrentLocation.second * 3 + 1] = 'O';
+			}
+			else if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == '-')
+			{
+				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
+				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3] = 'O';
+				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 2] = 'O';
+			}
+			else if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == 'L')
+			{
+				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
+				map[pipeCurrentLocation.first * 3][pipeCurrentLocation.second * 3 + 1] = 'O';
+				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 2] = 'O';
+
+			}
+			else if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == 'J')
+			{
+				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
+				map[pipeCurrentLocation.first * 3][pipeCurrentLocation.second * 3 + 1] = 'O';
+				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3] = 'O';
+			}
+			else if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == 'F')
+			{
+				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
+				map[pipeCurrentLocation.first * 3 + 2][pipeCurrentLocation.second * 3 + 1] = 'O';
+				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 2] = 'O';
+			}
+			else if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == '7')
+			{
+				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
+				map[pipeCurrentLocation.first * 3 + 2][pipeCurrentLocation.second * 3 + 1] = 'O';
+				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3] = 'O';
+			}
+		}
+		pipesCurrrentValue++;
+		if (pipesCurrrentLocations[0].first == pipesCurrrentLocations[1].first && pipesCurrrentLocations[0].second == pipesCurrrentLocations[1].second)
+			break;
+	}
+
+	fileHandler.WriteFile("Day10Map.txt", map);
+	std::cout << "Part One: " << pipesCurrrentValue << std::endl;
+
+	std::vector<std::pair<int, int>> tmp;
+	for (int i = 0; i < map.size(); i++)
+	{
+		for (int j = 0; j < map[i].length(); j++)
+		{
+			if (map[i][j] == 'O')
+			{
+				if (map[i + 1][j + 1] != '.')
+				{
+					std::cout << "Wrong data!\n";
+					return;
+				}
+				map[i + 1][j + 1] = 'I';
+				tmp.push_back({ i + 1,j + 1 });
+				break;
+			}
+		}
+		if (tmp.size())
+			break;
+	}
+	int i = 0;
+	do
+	{
+		std::pair<int, int> tmp1 = tmp[i];
+		if (map[tmp1.first - 1][tmp1.second] == '.')
+		{
+			map[tmp1.first - 1][tmp1.second] = 'I';
+			tmp.push_back({ tmp1.first - 1,tmp1.second });
+		}
+		if (map[tmp1.first + 1][tmp1.second] == '.')
+		{
+			map[tmp1.first + 1][tmp1.second] = 'I';
+			tmp.push_back({ tmp1.first + 1,tmp1.second });
+		}
+		if (map[tmp1.first][tmp1.second - 1] == '.')
+		{
+			map[tmp1.first][tmp1.second - 1] = 'I';
+			tmp.push_back({ tmp1.first,tmp1.second - 1 });
+		}
+		if (map[tmp1.first][tmp1.second + 1] == '.')
+		{
+			map[tmp1.first][tmp1.second + 1] = 'I';
+			tmp.push_back({ tmp1.first,tmp1.second + 1 });
+		}
+		i++;
+	} while (i < tmp.size());
+	fileHandler.WriteFile("Day10Map1.txt", map);
+
+	int count = 0;
+	for (int i = 0; i < map.size(); i += 3)
+	{
+		for (int j = 0; j < map[i + 1].length(); j += 3)
+		{
+			if (map[i][j] == 'I' && map[i + 1][j] == 'I' && map[i - 1][j] == 'I' && map[i][j + 1] == 'I' && map[i][j - 1] == 'I' && map[i + 1][j + 1] == 'I' && map[i - 1][j - 1] == 'I' && map[i + 1][j - 1] == 'I' && map[i - 1][j + 1] == 'I')
+				count++;
+		}
+	}
+	std::cout << "Part Two: " << count << std::endl;
+}
+
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(std::vector<std::pair<long long, long long>> tab, std::vector<std::vector<long long>> mapping)
 {
 	std::vector<std::pair<long long, long long>> tmp;
@@ -875,4 +1084,71 @@ int DayHandler::Day7GetType(std::string type, bool activeJokers) const
 	else if (repeats == 2 && repeatingLabels.size() == 1)
 		return 2;
 	return 1;
+}
+
+bool DayHandler::Day10HandlePipe(std::pair<int, int>* previousLocation, std::pair<int, int>* currentLocation, const std::vector<std::string> map)
+{
+	std::pair<int, int> nextLocation;
+	if (map[currentLocation->first][currentLocation->second] == '|')
+	{
+		if (previousLocation->first == currentLocation->first - 1)
+			nextLocation = { currentLocation->first + 1,currentLocation->second };
+		else if (previousLocation->first == currentLocation->first + 1)
+			nextLocation = { currentLocation->first - 1,currentLocation->second };
+		else
+			return false;
+	}
+	else if (map[currentLocation->first][currentLocation->second] == '-')
+	{
+		if (previousLocation->second == currentLocation->second - 1)
+			nextLocation = { currentLocation->first ,currentLocation->second + 1 };
+		else if (previousLocation->second == currentLocation->second + 1)
+			nextLocation = { currentLocation->first ,currentLocation->second - 1 };
+		else
+			return false;
+	}
+	else if (map[currentLocation->first][currentLocation->second] == 'F')
+	{
+		if (previousLocation->first == currentLocation->first + 1)
+			nextLocation = { currentLocation->first ,currentLocation->second + 1 };
+		else if (previousLocation->second == currentLocation->second + 1)
+			nextLocation = { currentLocation->first + 1,currentLocation->second };
+		else
+			return false;
+	}
+	else if (map[currentLocation->first][currentLocation->second] == '7')
+	{
+		if (previousLocation->first == currentLocation->first + 1)
+			nextLocation = { currentLocation->first ,currentLocation->second - 1 };
+		else if (previousLocation->second == currentLocation->second - 1)
+			nextLocation = { currentLocation->first + 1,currentLocation->second };
+		else
+			return false;
+	}
+	else if (map[currentLocation->first][currentLocation->second] == 'J')
+	{
+		if (previousLocation->first == currentLocation->first - 1)
+			nextLocation = { currentLocation->first ,currentLocation->second - 1 };
+		else if (previousLocation->second == currentLocation->second - 1)
+			nextLocation = { currentLocation->first - 1,currentLocation->second };
+		else
+			return false;
+	}
+	else if (map[currentLocation->first][currentLocation->second] == 'L')
+	{
+		if (previousLocation->first == currentLocation->first - 1)
+			nextLocation = { currentLocation->first ,currentLocation->second + 1 };
+		else if (previousLocation->second == currentLocation->second + 1)
+			nextLocation = { currentLocation->first - 1,currentLocation->second };
+		else
+			return false;
+	}
+	else
+		return false;
+
+	previousLocation->first = currentLocation->first;
+	previousLocation->second = currentLocation->second;
+	currentLocation->first = nextLocation.first;
+	currentLocation->second = nextLocation.second;
+	return true;
 }
