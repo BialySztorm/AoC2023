@@ -7,6 +7,8 @@ class FileHandler
 private:
 	std::string inputDir;
 	std::string outputDir;
+	bool CreateDirectory(const std::string& path) const;
+
 
 public:
 	FileHandler(const std::string inputDir, const std::string outputDir);

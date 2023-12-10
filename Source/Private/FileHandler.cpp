@@ -1,5 +1,23 @@
 #include "FileHandler.h"
 #include <fstream>
+#include <filesystem>
+#include <iostream>
+
+bool FileHandler::CreateDirectory(const std::string& path) const
+{
+	try {
+		std::string outputDir = path.substr(0, path.find_last_of("/\\") + 1);
+		if (!std::filesystem::exists(outputDir)) {
+			std::filesystem::create_directory(outputDir);
+		}
+		return true;
+	}
+	catch (const std::exception& e) {
+		std::cerr << "B³¹d przy tworzeniu katalogu: " << e.what() << std::endl;
+		return false;
+	}
+	return false;
+}
 
 FileHandler::FileHandler(const std::string inputDir, const std::string outputDir)
 {
@@ -26,6 +44,8 @@ std::vector<std::string> FileHandler::ReadFile(const std::string fileName) const
 
 bool FileHandler::WriteFile(const std::string fileName, const std::vector<std::string> content) const
 {
+	if (!CreateDirectory(outputDir + fileName))
+		return false;
 	std::ofstream file(outputDir + fileName);
 	if (file.is_open())
 	{
@@ -41,6 +61,8 @@ bool FileHandler::WriteFile(const std::string fileName, const std::vector<std::s
 
 bool FileHandler::WriteFile(const std::string fileName, const std::vector<std::vector<char>> content) const
 {
+	if (!CreateDirectory(outputDir + fileName))
+		return false;
 	std::ofstream file(outputDir + fileName);
 	if (file.is_open())
 	{
