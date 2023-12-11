@@ -12,6 +12,7 @@ Main::Main()
 	{
 		Menu(dayHandler->getCurrentDay());
 		std::cin >> option;
+		std::cout << std::endl;
 		if (option <= 0 || option > 25)
 		{
 			system("cls");
@@ -20,6 +21,7 @@ Main::Main()
 		SetConsoleColor(14);
 		dayHandler->HandleDay(option);
 		SetConsoleColor(8);
+		std::cout << std::endl;
 		system("pause");
 		system("cls");
 	} while (option > 0);
