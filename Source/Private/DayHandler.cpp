@@ -947,6 +947,65 @@ void DayHandler::Day10(FileHandler& fileHandler)
 		}
 	}
 	std::cout << "Part Two: " << count << std::endl;
+
+	std::cout << "\nGenerating pipe map...\n";
+
+	for (int i = 0; i < map.size(); i+=3)
+	{
+		for (int j = 0; j < map[i].length(); j+=3)
+		{
+			// Comment this fragment for get filled inside
+			for (int k = 0; k < 3; k++)
+			{
+				for (int l = 0; l < 3; l++)
+				{
+					map[i+k][j+l] = '.';
+				}
+			}
+			// end of fragment
+			if (tab[i/3][j/3] == '|')
+			{
+				map[i + 1][j + 1] = 'O';
+				map[i][j + 1] = 'O';
+				map[i + 2][j + 1] = 'O';
+			}
+			else if (tab[i/3][j/3] == '-')
+			{
+				map[i + 1][j + 1] = 'O';
+				map[i + 1][j] = 'O';
+				map[i + 1][j + 2] = 'O';
+			}
+			else if (tab[i/3][j/3] == 'L')
+			{
+				map[i + 1][j + 1] = 'O';
+				map[i][j + 1] = 'O';
+				map[i + 1][j + 2] = 'O';
+			}
+			else if (tab[i/3][j/3] == 'J')
+			{
+				map[i + 1][j + 1] = 'O';
+				map[i][j + 1] = 'O';
+				map[i + 1][j] = 'O';
+			}
+			else if (tab[i/3][j/3] == 'F')
+			{
+				map[i + 1][j + 1] = 'O';
+				map[i + 2][j + 1] = 'O';
+				map[i + 1][j + 2] = 'O';
+			}
+			else if (tab[i/3][j/3] == '7')
+			{
+				map[i + 1][j + 1] = 'O';
+				map[i + 2][j + 1] = 'O';
+				map[i + 1][j] = 'O';
+			}
+		}
+	}
+	bool isMapGenerated = fileHandler.WriteFile("Day10Map2.txt",map);
+	if(isMapGenerated)
+		std::cout<<"Map generated properly to file Day10Map2.txt\n";
+	else
+		std::cout<<"An error occured while trying to save map!\n";
 }
 
 void DayHandler::Day11(FileHandler& fileHandler)
