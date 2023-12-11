@@ -11,6 +11,7 @@ public:
 	static std::vector<std::string> SplitString(const std::string& input, const char delimiter, std::vector<int> unnecesaryColumns);
 	static std::vector<std::string> SplitString(const std::string& input, const std::vector<char> delimiters);
 	static std::vector<std::string> SplitString(const std::string& input, const std::vector<char> delimiters, std::vector<int> unnecesaryColumns);
+	static bool IsWithinRange(const int point, const std::pair<const int, const int> range);
 	static bool IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, const std::pair<int, int>> range);
 	static bool IsNumber(const std::string& s);
 	template <typename T>
