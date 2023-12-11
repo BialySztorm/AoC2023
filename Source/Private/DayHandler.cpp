@@ -23,6 +23,7 @@ DayHandler::DayHandler(std::string inputDir, std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day8);
 	dayFunctions.emplace_back(&DayHandler::Day9);
 	dayFunctions.emplace_back(&DayHandler::Day10);
+	dayFunctions.emplace_back(&DayHandler::Day11);
 	currentDay = dayFunctions.size();
 }
 
@@ -946,6 +947,98 @@ void DayHandler::Day10(FileHandler& fileHandler)
 		}
 	}
 	std::cout << "Part Two: " << count << std::endl;
+}
+
+void DayHandler::Day11(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day11.txt");
+	std::vector<int> expansionColumns;
+	std::vector<int> expansionRows;
+
+	// Expand X
+	for (int i = 0; i < tab[0].length(); i++)
+	{
+		int count = 0;
+		for (int j = 0; j < tab.size(); j++)
+		{
+			if (tab[j][i] == '#')
+				break;
+			count++;
+		}
+		if (count == tab.size())
+		{
+			expansionColumns.push_back(i);
+		}
+	}
+	// Expand Y
+	for (int i = 0; i < tab.size(); i++)
+	{
+		std::string count = "";
+		for (int j = 0; j < tab[i].length(); j++)
+		{
+			if (tab[i][j] == '#')
+				break;
+			count += '.';
+		}
+		if (count.length() == tab[i].length())
+		{
+			expansionRows.push_back(i);
+		}
+	}
+	// Find all galaxies
+	std::vector<std::pair<int, int>> galaxies;
+	for (int i = 0; i < tab.size(); i++)
+	{
+		for (int j = 0; j < tab[i].length(); j++)
+		{
+			if (tab[i][j] == '#')
+				galaxies.push_back({ i,j });
+		}
+	}
+	// get distance between all galaxies
+	long long distanceSum = 0;
+	int multiplayer = 2;
+	for (int i = 0; i < galaxies.size() - 1; i++)
+	{
+		for (int j = i + 1; j < galaxies.size(); j++)
+		{
+			distanceSum += std::abs(galaxies[i].first - galaxies[j].first) + std::abs(galaxies[i].second - galaxies[j].second);
+			for (int expansionColumn : expansionColumns)
+			{
+				if (CustomLib::IsWithinRange(expansionColumn, { galaxies[i].second,galaxies[j].second }))
+					distanceSum += 1 * multiplayer - 1;
+			}
+			for (int expansionRow : expansionRows)
+			{
+				if (CustomLib::IsWithinRange(expansionRow, { galaxies[i].first,galaxies[j].first }))
+					distanceSum += 1 * multiplayer - 1;
+			}
+		}
+	}
+
+	std::cout << "Part One: " << distanceSum << std::endl;
+	// get distance between all galaxies
+	distanceSum = 0;
+	multiplayer = 1000000;
+	for (int i = 0; i < galaxies.size() - 1; i++)
+	{
+		for (int j = i + 1; j < galaxies.size(); j++)
+		{
+			distanceSum += std::abs(galaxies[i].first - galaxies[j].first) + std::abs(galaxies[i].second - galaxies[j].second);
+			for (int expansionColumn : expansionColumns)
+			{
+				if (CustomLib::IsWithinRange(expansionColumn, { galaxies[i].second,galaxies[j].second }))
+					distanceSum += 1 * multiplayer - 1;
+			}
+			for (int expansionRow : expansionRows)
+			{
+				if (CustomLib::IsWithinRange(expansionRow, { galaxies[i].first,galaxies[j].first }))
+					distanceSum += 1 * multiplayer - 1;
+			}
+		}
+	}
+
+	std::cout << "Part Two: " << distanceSum << std::endl;
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(std::vector<std::pair<long long, long long>> tab, std::vector<std::vector<long long>> mapping)
