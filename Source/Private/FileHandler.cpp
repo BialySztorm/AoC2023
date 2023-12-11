@@ -3,19 +3,22 @@
 #include <filesystem>
 #include <iostream>
 
+#include "CustomLib.h"
+
 bool FileHandler::CreateDirectory(const std::string& path) const
 {
+	std::string outputDir = path.substr(0, path.find_last_of("/\\") + 1);
 	try {
-		std::string outputDir = path.substr(0, path.find_last_of("/\\") + 1);
 		if (!std::filesystem::exists(outputDir)) {
 			std::filesystem::create_directory(outputDir);
 		}
 		return true;
 	}
 	catch (const std::exception& e) {
-		std::cerr << "B³¹d przy tworzeniu katalogu: " << e.what() << std::endl;
+		CustomLib::PushError("Error while creating directory: " + outputDir);
 		return false;
 	}
+	CustomLib::PushError("Unknown exception while creating directory: " + outputDir);
 	return false;
 }
 
@@ -39,6 +42,8 @@ std::vector<std::string> FileHandler::ReadFile(const std::string fileName) const
 		}
 		file.close();
 	}
+	else
+		CustomLib::PushError("Error while opening file: " + inputDir + fileName);
 	return tab;
 }
 
@@ -56,6 +61,8 @@ bool FileHandler::WriteFile(const std::string fileName, const std::vector<std::s
 		file.close();
 		return true;
 	}
+	
+	CustomLib::PushError("Error while creating file: " + outputDir + fileName);
 	return false;
 }
 
@@ -77,5 +84,6 @@ bool FileHandler::WriteFile(const std::string fileName, const std::vector<std::v
 		file.close();
 		return true;
 	}
+	CustomLib::PushError("Error while creating file: " + outputDir + fileName);
 	return false;
 }

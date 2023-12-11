@@ -8,5 +8,4 @@ private:
 	int option = 0;
 
 	void Menu(const int day);
-	void SetConsoleColor(int color);
 };

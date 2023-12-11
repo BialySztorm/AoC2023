@@ -1,6 +1,7 @@
 #include "CustomLib.h"
 #include <algorithm>
 #include <iostream>
+#include <Windows.h>
 
 std::vector<std::string> CustomLib::SplitString(const std::string& input, const char delimiter)
 {
@@ -78,5 +79,12 @@ bool CustomLib::IsNumber(const std::string& s)
 
 void CustomLib::PushError(const std::string e)
 {
+	SetConsoleColor(12);
 	std::cerr << e << std::endl;
+	SetConsoleColor(14);
+}
+
+void CustomLib::SetConsoleColor(int color)
+{
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }

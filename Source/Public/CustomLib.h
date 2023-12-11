@@ -14,10 +14,11 @@ public:
 	static bool IsWithinRange(const int point, const std::pair<const int, const int> range);
 	static bool IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, const std::pair<int, int>> range);
 	static bool IsNumber(const std::string& s);
+	static void PushError(const std::string e);
+	static void SetConsoleColor(int color);
 	template <typename T>
 	static std::vector<T> VectorStringToNumber(const std::vector<std::string>& stringVector);
 private:
-	static void PushError(const std::string e);
 	template <typename T, typename U, typename CompareFunction>
 	static U Partition(std::vector<T>& arr, U low, U high, bool type, CompareFunction compare);
 	template <typename T>
