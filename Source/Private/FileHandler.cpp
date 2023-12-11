@@ -1,5 +1,4 @@
 #include "FileHandler.h"
-#include <fstream>
 #include <filesystem>
 #include <iostream>
 
@@ -61,7 +60,7 @@ bool FileHandler::WriteFile(const std::string fileName, const std::vector<std::s
 		file.close();
 		return true;
 	}
-	
+
 	CustomLib::PushError("Error while creating file: " + outputDir + fileName);
 	return false;
 }

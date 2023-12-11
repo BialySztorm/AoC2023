@@ -15,6 +15,7 @@ private:
 	// private variables
 	int currentDay;
 	std::vector<void (DayHandler::*)(FileHandler&)> dayFunctions;
+	std::vector<std::string> dayNames;
 	FileHandler* fileHandler;
 
 	// Main day functions

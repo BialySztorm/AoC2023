@@ -13,6 +13,7 @@
 DayHandler::DayHandler(std::string inputDir, std::string outputDir)
 {
 	fileHandler = new FileHandler(inputDir, outputDir);
+	dayNames = fileHandler->ReadJsonFile<std::vector<std::string>>("names.json");
 	dayFunctions.emplace_back(&DayHandler::Day1);
 	dayFunctions.emplace_back(&DayHandler::Day2);
 	dayFunctions.emplace_back(&DayHandler::Day3);
@@ -31,7 +32,16 @@ void DayHandler::HandleDay(int day)
 {
 	if (day <= currentDay && day > 0)
 	{
+		if (day - 1 < dayNames.size())
+			std::cout << dayNames[day - 1] << std::endl << std::endl;
 		(this->*dayFunctions[day - 1])(*fileHandler);
+		if (day - 1 < dayNames.size())
+		{
+			std::cout << std::endl;
+			for (int i = 0; i < dayNames[day - 1].length(); i++)
+				std::cout << "-";
+			std::cout << std::endl;
+		}
 	}
 	else
 	{
