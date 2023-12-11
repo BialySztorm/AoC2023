@@ -787,7 +787,6 @@ void DayHandler::Day10(FileHandler& fileHandler)
 	map[sLocation.first * 3 + 2][sLocation.second * 3 + 1] = 'O';
 	map[sLocation.first * 3 + 1][sLocation.second * 3 + 2] = 'O';
 
-
 	for (std::pair<int, int> pipeCurrentLocation : pipesCurrrentLocations)
 	{
 		//map[pipeCurrentLocation.first][pipeCurrentLocation.second] = tab[pipeCurrentLocation.first][pipeCurrentLocation.second];
@@ -808,7 +807,6 @@ void DayHandler::Day10(FileHandler& fileHandler)
 			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
 			map[pipeCurrentLocation.first * 3][pipeCurrentLocation.second * 3 + 1] = 'O';
 			map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 2] = 'O';
-
 		}
 		else if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == 'J')
 		{
@@ -862,7 +860,6 @@ void DayHandler::Day10(FileHandler& fileHandler)
 				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 1] = 'O';
 				map[pipeCurrentLocation.first * 3][pipeCurrentLocation.second * 3 + 1] = 'O';
 				map[pipeCurrentLocation.first * 3 + 1][pipeCurrentLocation.second * 3 + 2] = 'O';
-
 			}
 			else if (tab[pipeCurrentLocation.first][pipeCurrentLocation.second] == 'J')
 			{
