@@ -98,7 +98,7 @@ inline void CustomLib::QuickSort(std::vector<T>& arr, const U low, const U high,
 template<typename T>
 inline bool CustomLib::Compare(const T a, const T b, const bool type)
 {
-	if(!type)
+	if (!type)
 		return a < b;
 	else
 		return a > b;

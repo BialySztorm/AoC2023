@@ -35,4 +35,3 @@ inline nlohmann::json FileHandler::ReadJsonFile<nlohmann::json>(const std::strin
 	nlohmann::json jsonData = ReadJsonFileStruct(fileName);
 	return jsonData;
 }
-
