@@ -8,7 +8,7 @@
 #include "CustomLib.h"
 #include "FileHandler.h"
 
-DayHandler::DayHandler(std::string inputDir, std::string outputDir)
+DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 {
 	fileHandler = new FileHandler(inputDir, outputDir);
 	dayNames = fileHandler->ReadJsonFile<std::vector<std::string>>("names.json");
@@ -27,7 +27,7 @@ DayHandler::DayHandler(std::string inputDir, std::string outputDir)
 	currentDay = dayFunctions.size();
 }
 
-void DayHandler::HandleDay(int day)
+void DayHandler::HandleDay(const int day)
 {
 	if (day <= currentDay && day > 0)
 	{
@@ -48,7 +48,7 @@ void DayHandler::HandleDay(int day)
 	}
 }
 
-int DayHandler::getCurrentDay()
+int DayHandler::getCurrentDay() const
 {
 	return currentDay;
 }
@@ -56,11 +56,13 @@ int DayHandler::getCurrentDay()
 void DayHandler::Day1(FileHandler& fileHandler)
 {
 	std::vector<std::string> tab = fileHandler.ReadFile("day1.txt");
+	size_t tabSize = tab.size();
 
 	// Part one
-	int calibrationSum = 0;
+	int calibrationSum = 0, element = 0;
 	for (const std::string line : tab)
 	{
+		std::cout << element++ << "/" << tabSize << "\r";
 		char numbers[] = { NULL, NULL };
 		for (const char ch : line)
 		{
@@ -87,12 +89,13 @@ void DayHandler::Day1(FileHandler& fileHandler)
 	}
 	std::cout << "Part One: " << calibrationSum << std::endl;
 
-	calibrationSum = 0;
+	calibrationSum = element = 0;
 
 	// Part two
 	std::string numbersDict[] = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
 	for (const std::string line : tab)
 	{
+		std::cout << element++ << "/" << tabSize << "\r";
 		char numbers[] = { NULL, NULL };
 		for (int i = 0; i < line.length(); i++)
 		{
@@ -145,10 +148,12 @@ void DayHandler::Day1(FileHandler& fileHandler)
 void DayHandler::Day2(FileHandler& fileHandler)
 {
 	std::vector<std::string> tab = fileHandler.ReadFile("day2.txt");
+	size_t tabSize = tab.size();
 
-	int fairGames = 0;
+	int fairGames = 0, element = 0;
 	for (std::string line : tab)
 	{
+		std::cout << element++ << "/" << tabSize << "\r";
 		bool fairGame = true;
 		std::vector<std::string> tmp = CustomLib::SplitString(line, { ' ', ':', ';', ',' }, { 0, 1 });
 		for (int i = 0; i < tmp.size() / 2; i++)
@@ -179,8 +184,10 @@ void DayHandler::Day2(FileHandler& fileHandler)
 	std::cout << "Part One: " << fairGames << std::endl;
 
 	int sum = 0;
+	element = 0;
 	for (std::string line : tab)
 	{
+		std::cout << element++ << "/" << tabSize << "\r";
 		int maxR = 1, maxG = 1, maxB = 1;
 		std::vector<std::string> tmp1 = CustomLib::SplitString(line, { ' ', ':', ';', ',' }, { 0, 1 });
 		for (int i = 0; i < tmp1.size() / 2; i++)
@@ -209,11 +216,13 @@ void DayHandler::Day2(FileHandler& fileHandler)
 void DayHandler::Day3(FileHandler& fileHandler)
 {
 	std::vector<std::string> tab = fileHandler.ReadFile("day3.txt");
+	size_t tabSize = tab.size();
 
 	std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> tmp, tmp1;
 
 	for (int i = 0; i < tab.size(); i++)
 	{
+		std::cout << i << "/" << tabSize << "\r";
 		bool isNum = false;
 		std::pair<int, int> start, end;
 		for (int j = 0; j < tab[i].length(); j++)
@@ -236,9 +245,11 @@ void DayHandler::Day3(FileHandler& fileHandler)
 			tmp.push_back({ start,end });
 		}
 	}
-
+	tabSize = tmp.size();
+	int element = 0;
 	for (std::pair<std::pair<int, int>, std::pair<int, int>> tmp2 : tmp)
 	{
+		std::cout << element++ << "/" << tabSize << "\r";
 		int min = tmp2.first.second, max = tmp2.second.second, height = tmp2.first.first;
 		bool isCorrect = false;
 		for (int i = min; i <= max; i++)
@@ -304,8 +315,11 @@ void DayHandler::Day3(FileHandler& fileHandler)
 				gearRatios.push_back({ i,j });
 
 	int ratioSum = 0;
+	element = 0;
+	tabSize = gearRatios.size();
 	for (std::pair<int, int> gearRatio : gearRatios)
 	{
+		std::cout << element++ << "/" << tabSize << "\r";
 		std::pair<int, int> one = { -1,-1 }, two = { -1,-1 };
 		int i = gearRatio.second, height = gearRatio.first;
 		if (i > 0 && isdigit(tab[height][i - 1]))
@@ -420,9 +434,11 @@ void DayHandler::Day4(FileHandler& fileHandler)
 		std::vector<std::string> tmp1 = CustomLib::SplitString(tmp, { ':','|' });
 		tab1.push_back(tmp1);
 	}
-	int points = 0;
+	int points = 0, element = 0;
+	size_t tabSize = tab1.size();
 	for (std::vector<std::string> tmp : tab1)
 	{
+		std::cout << element++ << "/" << tabSize << "\r";
 		int multiply = 0;
 		std::vector<int> winningNumbers, myNumbers;
 		for (std::string tmp1 : CustomLib::SplitString(tmp[1], ' '))
@@ -451,15 +467,17 @@ void DayHandler::Day4(FileHandler& fileHandler)
 	}
 	std::cout << "Part One: " << points << std::endl;
 
-	int* scratchcards = new int[tab.size()];
-	for (int i = 0; i < tab.size(); i++)
+	tabSize = tab.size();
+	int* scratchcards = new int[tabSize];
+	for (int i = 0; i < tabSize; i++)
 	{
 		scratchcards[i] = 1;
 	}
 	int scratchcardsNum = 0;
-	for (int i = 0; i < tab.size(); i++)
+	for (int i = 0; i < tabSize; i++)
 	{
-		if (scratchcards[i] != NULL)
+		std::cout << i << "/" << tabSize << "\r";
+		if (scratchcards != nullptr && scratchcards[i] != NULL)
 			scratchcardsNum += scratchcards[i];
 		//std::cout << i << ", " << scratchcards[i] << std::endl;
 		int tmp = 0;
@@ -504,8 +522,10 @@ void DayHandler::Day5(FileHandler& fileHandler)
 	for (int i = 0; i < seeds.size(); i++)
 		seedsLevel.push_back(0);
 	int currentLevel = 0, seedsUnderLevel = 0;
-	for (int i = 1; i < tab.size(); i++)
+	size_t tabSize = tab.size();
+	for (int i = 1; i < tabSize; i++)
 	{
+		std::cout << i << "/" << tabSize << "\r";
 		if (tab[i] == "")
 		{
 			i += 2;
@@ -540,8 +560,9 @@ void DayHandler::Day5(FileHandler& fileHandler)
 
 	{
 		std::vector <std::vector<long long>> tmp;
-		for (int i = 1; i < tab.size(); i++)
+		for (int i = 1; i < tabSize; i++)
 		{
+			std::cout << i << "/" << tabSize << "\r";
 			if (tab[i] == "")
 			{
 				if (i != 1)
@@ -556,8 +577,9 @@ void DayHandler::Day5(FileHandler& fileHandler)
 		mappings.push_back(tmp);
 	}
 	std::vector<long long> locations;
-
-	for (size_t i = 0; i < seeds.size(); i += 2) {
+	tabSize = seeds.size();
+	for (size_t i = 0; i < tabSize; i += 2) {
+		std::cout << i << "/" << tabSize << "\r";
 		long long seedStart = seeds[i];
 		long long seedSize = seeds[i + 1];
 		std::vector<std::pair<long long, long long>> tmp = { { seedStart, seedStart + seedSize } };
@@ -576,8 +598,10 @@ void DayHandler::Day6(FileHandler& fileHandler) {
 	std::vector<int> times = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tab[0], ' ', { 0 }));
 	std::vector<int> distances = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tab[1], ' ', { 0 }));
 	int margin = 1;
-	for (int i = 0; i < times.size(); i++)
+	size_t tabSize = times.size();
+	for (int i = 0; i < tabSize; i++)
 	{
+		std::cout << i << "/" << tabSize << "\r";
 		int currentMargin = 0;
 		for (int j = 1; j < times[i]; j++)
 		{
@@ -619,15 +643,19 @@ void DayHandler::Day7(FileHandler& fileHandler) {
 		players.push_back({ tmp[0], std::stoi(tmp[1]) });
 	}
 	std::vector<std::vector<std::pair<int, std::string>>> types = { {},{},{},{},{},{},{} };
-	for (int i = 0; i < players.size(); i++)
+	size_t tabSize = players.size();
+	for (int i = 0; i < tabSize; i++)
 	{
+		std::cout << i << "/" << tabSize << "\r";
 		int type = Day7GetType(players[i].first);
 		types[type - 1].push_back({ i, players[i].first });
 	}
-	int size = 0;
+	int size = 0, element = 0;
 	long long money = 0;
+	tabSize = types.size();
 	for (std::vector<std::pair<int, std::string>> tmp : types)
 	{
+		std::cout << element++ << "/" << tabSize << "\r";
 		std::vector<std::pair<int, std::string>> tmp1 = tmp;
 		CustomLib::QuickSort(tmp1, 0, decltype(0)(tmp1.size() - 1), false, CustomLib::Day7Compare<decltype(tmp1)::value_type>);
 		for (std::pair<int, std::string> player : tmp1)
@@ -637,15 +665,20 @@ void DayHandler::Day7(FileHandler& fileHandler) {
 	std::cout << "Part One: " << money << std::endl;
 
 	types = { {},{},{},{},{},{},{} };
+	tabSize = players.size();
 	for (int i = 0; i < players.size(); i++)
 	{
+		std::cout << i << "/" << tabSize << "\r";
 		int type = Day7GetType(players[i].first, true);
 		types[type - 1].push_back({ i, players[i].first });
 	}
 	size = 0;
 	money = 0;
+	element = 0;
+	tabSize = types.size();
 	for (std::vector<std::pair<int, std::string>> tmp : types)
 	{
+		std::cout << element++ << "/" << tabSize << "\r";
 		std::vector<std::pair<int, std::string>> tmp1 = tmp;
 		CustomLib::QuickSort(tmp1, 0, decltype(0)(tmp1.size() - 1), true, CustomLib::Day7Compare<decltype(tmp1)::value_type>);
 		for (std::pair<int, std::string> player : tmp1)
@@ -696,8 +729,10 @@ void DayHandler::Day8(FileHandler& fileHandler)
 		}
 	}
 
-	for (int i = 0; i < currents.size(); i++)
+	size_t tabSize = currents.size();
+	for (int i = 0; i < tabSize; i++)
 	{
+		std::cout << i << "/" << tabSize << "\r";
 		current = currents[i];
 		//std::cout << current << " - ";
 		step = 0;
@@ -731,23 +766,25 @@ void DayHandler::Day9(FileHandler& fileHandler)
 
 	std::cout << "Test: " << testSum << std::endl;*/
 	long long sum = 0;
-	//int size = tab.size(), i = 0;
+	size_t tabSize = tab.size();
+	int element = 0;
 	for (std::string line : tab)
 	{
+		std::cout << element++ << "/" << tabSize << "\r";
 		std::vector<long long> tmp = CustomLib::VectorStringToNumber<long long>(CustomLib::SplitString(line, ' '));
 		long long tmp1 = CustomLib::Extrapolation<long long>(tmp);
 		sum += tmp1;
-		//std::cout << ++i << "/" << size << " - " <<sum<<", " << tmp1 << std::endl;
 	}
 	std::cout << "Part One: " << sum << std::endl;
 
 	sum = 0;
+	element = 0;
 	for (std::string line : tab)
 	{
+		std::cout << element++ << "/" << tabSize << "\r";
 		std::vector<long long> tmp = CustomLib::VectorStringToNumber<long long>(CustomLib::SplitString(line, ' '));
 		long long tmp1 = CustomLib::Extrapolation<long long>(tmp, false);
 		sum += tmp1;
-		//std::cout << ++i << "/" << size << " - " <<sum<<", " << tmp1 << std::endl;
 	}
 
 	std::cout << "Part Two: " << sum << std::endl;
@@ -899,8 +936,10 @@ void DayHandler::Day10(FileHandler& fileHandler)
 	std::cout << "Part One: " << pipesCurrrentValue << std::endl;
 
 	std::vector<std::pair<int, int>> tmp;
+	size_t tabSize = map.size();
 	for (int i = 0; i < map.size(); i++)
 	{
+		std::cout << i << "/" << tabSize << "\r";
 		for (int j = 0; j < map[i].length(); j++)
 		{
 			if (map[i][j] == 'O')
@@ -1055,8 +1094,10 @@ void DayHandler::Day11(FileHandler& fileHandler)
 	}
 	// Find all galaxies
 	std::vector<std::pair<int, int>> galaxies;
+	size_t tabSize = tab.size();
 	for (int i = 0; i < tab.size(); i++)
 	{
+		std::cout << i << "/" << tabSize << "\r";
 		for (int j = 0; j < tab[i].length(); j++)
 		{
 			if (tab[i][j] == '#')
@@ -1066,8 +1107,10 @@ void DayHandler::Day11(FileHandler& fileHandler)
 	// get distance between all galaxies
 	long long distanceSum = 0;
 	int multiplayer = 2;
+	tabSize = galaxies.size();
 	for (int i = 0; i < galaxies.size() - 1; i++)
 	{
+		std::cout << i << "/" << tabSize << "\r";
 		for (int j = i + 1; j < galaxies.size(); j++)
 		{
 			distanceSum += std::abs(galaxies[i].first - galaxies[j].first) + std::abs(galaxies[i].second - galaxies[j].second);
@@ -1090,6 +1133,7 @@ void DayHandler::Day11(FileHandler& fileHandler)
 	multiplayer = 1000000;
 	for (int i = 0; i < galaxies.size() - 1; i++)
 	{
+		std::cout << i << "/" << tabSize << "\r";
 		for (int j = i + 1; j < galaxies.size(); j++)
 		{
 			distanceSum += std::abs(galaxies[i].first - galaxies[j].first) + std::abs(galaxies[i].second - galaxies[j].second);
@@ -1147,9 +1191,9 @@ void DayHandler::Day12(FileHandler& fileHandler)
 	std::cout << "Part Two: " << count << std::endl;
 }
 
-std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(std::vector<std::pair<long long, long long>> tab, std::vector<std::vector<long long>> mapping)
+std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const
 {
-	std::vector<std::pair<long long, long long>> tmp;
+	std::vector<std::pair<long long, long long>> tmp, tab1 = tab;
 	for (int i = 0; i < mapping.size(); i++)
 	{
 		long long destination = mapping[i][0];
@@ -1157,10 +1201,10 @@ std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(std::vec
 		long long size = mapping[i][2];
 		long long sourceEnd = source + size;
 		std::vector<std::pair<long long, long long>> newTab;
-		while (tab.size())
+		while (tab1.size())
 		{
-			std::pair<long long, long long>& tmp1 = tab.back();
-			tab.pop_back();
+			std::pair<long long, long long>& tmp1 = tab1.back();
+			tab1.pop_back();
 			std::pair<long long, long long> before = { tmp1.first, std::min(tmp1.second, source) };
 			std::pair<long long, long long> inter = { std::max(tmp1.first, source), std::min(sourceEnd, tmp1.second) };
 			std::pair<long long, long long> after = { std::max(sourceEnd, tmp1.first), tmp1.second };
@@ -1171,13 +1215,13 @@ std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(std::vec
 			if (after.second > after.first)
 				newTab.push_back(after);
 		}
-		tab = newTab;
+		tab1 = newTab;
 	}
-	tmp.insert(tmp.end(), tab.begin(), tab.end());
+	tmp.insert(tmp.end(), tab1.begin(), tab1.end());
 	return tmp;
 }
 
-int DayHandler::Day7GetType(std::string type, bool activeJokers) const
+int DayHandler::Day7GetType(const std::string type, const bool activeJokers) const
 {
 	std::vector<char> labels, repeatingLabels;
 	int repeats = 0;
@@ -1282,7 +1326,7 @@ int DayHandler::Day7GetType(std::string type, bool activeJokers) const
 	return 1;
 }
 
-bool DayHandler::Day10HandlePipe(std::pair<int, int>* previousLocation, std::pair<int, int>* currentLocation, const std::vector<std::string> map)
+bool DayHandler::Day10HandlePipe(std::pair<int, int>* previousLocation, std::pair<int, int>* currentLocation, const std::vector<std::string> map) const
 {
 	std::pair<int, int> nextLocation;
 	if (map[currentLocation->first][currentLocation->second] == '|')

@@ -61,12 +61,12 @@ std::vector<std::string> CustomLib::SplitString(const std::string& input, const 
 	return tmp;
 }
 
-bool CustomLib::IsWithinRange(const int point, const std::pair<const int, const int> range)
+bool CustomLib::IsWithinRange(const int point, const std::pair<int, int> range)
 {
 	return (point >= range.first && point <= range.second || point <= range.first && point >= range.second);
 }
 
-bool CustomLib::IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, const std::pair<int, int>> range)
+bool CustomLib::IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, std::pair<int, int>> range)
 {
 	return (point.first >= range.first.first && point.first <= range.second.first &&
 		point.second >= range.first.second && point.second <= range.second.second);
@@ -97,7 +97,7 @@ void CustomLib::PushError(const std::string e)
 	SetConsoleColor(14);
 }
 
-void CustomLib::SetConsoleColor(int color)
+void CustomLib::SetConsoleColor(const int color)
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }

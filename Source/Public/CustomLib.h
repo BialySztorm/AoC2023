@@ -12,30 +12,30 @@ public:
 	static std::vector<std::string> SplitString(const std::string& input, const char delimiter, std::vector<int> unnecesaryColumns);
 	static std::vector<std::string> SplitString(const std::string& input, const std::vector<char> delimiters);
 	static std::vector<std::string> SplitString(const std::string& input, const std::vector<char> delimiters, std::vector<int> unnecesaryColumns);
-	static bool IsWithinRange(const int point, const std::pair<const int, const int> range);
-	static bool IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, const std::pair<int, int>> range);
+	static bool IsWithinRange(const int point, const std::pair<int, int> range);
+	static bool IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, std::pair<int, int>> range);
 	static bool IsNumber(const std::string& s);
 	static int CountOccurences(const std::string& str, const char target);
 	static void PushError(const std::string e);
-	static void SetConsoleColor(int color);
+	static void SetConsoleColor(const int color);
 	template <typename T>
 	static std::vector<T> VectorStringToNumber(const std::vector<std::string>& stringVector);
 	template <typename T>
-	static std::string DecToBin(T decimalNumber);
+	static std::string DecToBin(const T decimalNumber);
 	template <typename T>
 	static T BinToDec(const std::string& binaryString);
 private:
 	template <typename T, typename U, typename CompareFunction>
-	static U Partition(std::vector<T>& arr, U low, U high, bool type, CompareFunction compare);
+	static U Partition(std::vector<T>& arr, const U low, const U high, const bool type, const CompareFunction compare);
 	template <typename T>
-	static bool Compare(T a, T b, bool type);
+	static bool Compare(const T a, const T b, const bool type);
 	template <typename T>
 	static bool CheckTab(const std::vector<T> tab);
 public:
 	template <typename T>
-	static bool Day7Compare(T a, T b, bool type);
+	static bool Day7Compare(const T a, const T b, const bool type);
 	template <typename T, typename U, typename CompareFunction>
-	static void QuickSort(std::vector<T>& arr, U low, U high, bool type = false, CompareFunction compare = Compare<T>);
+	static void QuickSort(std::vector<T>& arr, const U low, const U high, const bool type = false, const CompareFunction compare = Compare<T>);
 	template <typename T>
 	static int Extrapolation(const std::vector<T>& values, const bool direction = true);
 };
@@ -72,7 +72,7 @@ inline std::vector<T> CustomLib::VectorStringToNumber(const std::vector<std::str
 }
 
 template <typename T>
-inline std::string CustomLib::DecToBin(T decimalNumber)
+inline std::string CustomLib::DecToBin(const T decimalNumber)
 {
 	std::bitset<sizeof(T) * 8> binaryRepresentation(decimalNumber);
 	return binaryRepresentation.to_string();
@@ -85,7 +85,7 @@ inline T CustomLib::BinToDec(const std::string& binaryString)
 }
 
 template<typename T, typename U, typename CompareFunction>
-inline void CustomLib::QuickSort(std::vector<T>& arr, U low, U high, bool type, CompareFunction compare)
+inline void CustomLib::QuickSort(std::vector<T>& arr, const U low, const U high, const bool type, const CompareFunction compare)
 {
 	if (low < high) {
 		U pi = Partition(arr, low, high, type, compare);
@@ -96,9 +96,12 @@ inline void CustomLib::QuickSort(std::vector<T>& arr, U low, U high, bool type, 
 }
 
 template<typename T>
-inline bool CustomLib::Compare(T a, T b, bool type)
+inline bool CustomLib::Compare(const T a, const T b, const bool type)
 {
-	return a < b;
+	if(!type)
+		return a < b;
+	else
+		return a > b;
 }
 
 template<typename T>
@@ -111,13 +114,13 @@ inline bool CustomLib::CheckTab(const std::vector<T> tab)
 }
 
 template<typename T>
-inline bool CustomLib::Day7Compare(T a, T b, bool type)
+inline bool CustomLib::Day7Compare(const T a, const T b, const bool type)
 {
 	return false;
 }
 
 template<>
-inline bool CustomLib::Day7Compare<std::pair<int, std::string>>(std::pair<int, std::string> a, std::pair<int, std::string> b, bool type)
+inline bool CustomLib::Day7Compare<std::pair<int, std::string>>(const std::pair<int, std::string> a, const std::pair<int, std::string> b, const bool type)
 {
 	std::map<char, int> cardValues;
 	if (!type)
@@ -167,7 +170,7 @@ inline bool CustomLib::Day7Compare<std::pair<int, std::string>>(std::pair<int, s
 }
 
 template<typename T, typename U, typename CompareFunction>
-inline U CustomLib::Partition(std::vector<T>& arr, U low, U high, bool type, CompareFunction compare)
+inline U CustomLib::Partition(std::vector<T>& arr, const U low, const U high, const bool type, const CompareFunction compare)
 {
 	T pivot = arr[high];
 	U i = low - 1;

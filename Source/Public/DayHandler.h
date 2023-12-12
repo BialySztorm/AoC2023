@@ -20,9 +20,9 @@ struct TupleHash {
 class DayHandler
 {
 public:
-	DayHandler(std::string inputDir, std::string outputDir);
-	void HandleDay(int day);
-	int getCurrentDay();
+	DayHandler(const std::string inputDir, const std::string outputDir);
+	void HandleDay(const int day);
+	int getCurrentDay() const;
 private:
 	// private variables
 	int currentDay;
@@ -47,8 +47,8 @@ private:
 	void Day12(FileHandler& fileHandler);
 
 	// Additional day functions
-	std::vector<std::pair<long long, long long>> Day5ApplyRange(std::vector<std::pair<long long, long long>> tab, std::vector<std::vector<long long>> mapping);
-	int Day7GetType(std::string type, bool activeJokers = false) const;
-	bool Day10HandlePipe(std::pair<int, int>* previousLocation, std::pair<int, int>* currentLocation, const std::vector<std::string> map);
+	std::vector<std::pair<long long, long long>> Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const;
+	int Day7GetType(const std::string type, const bool activeJokers = false) const;
+	bool Day10HandlePipe(std::pair<int, int>* previousLocation, std::pair<int, int>* currentLocation, const std::vector<std::string> map) const;
 	long long Day12CountOccurencies(const std::string& conditionReport, const std::vector<int>& damagedGroups, long long i = 0, long long gi = 0, long long current = 0);
 };
