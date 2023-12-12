@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <map>
+#include <bitset>
 
 class CustomLib
 {
@@ -14,10 +15,15 @@ public:
 	static bool IsWithinRange(const int point, const std::pair<const int, const int> range);
 	static bool IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, const std::pair<int, int>> range);
 	static bool IsNumber(const std::string& s);
+	static int CountOccurences(const std::string& str, const char target);
 	static void PushError(const std::string e);
 	static void SetConsoleColor(int color);
 	template <typename T>
 	static std::vector<T> VectorStringToNumber(const std::vector<std::string>& stringVector);
+	template <typename T>
+	static std::string DecToBin(T decimalNumber);
+	template <typename T>
+	static T BinToDec(const std::string& binaryString);
 private:
 	template <typename T, typename U, typename CompareFunction>
 	static U Partition(std::vector<T>& arr, U low, U high, bool type, CompareFunction compare);
@@ -63,6 +69,19 @@ inline std::vector<T> CustomLib::VectorStringToNumber(const std::vector<std::str
 		}
 	}
 	return convertedVector;
+}
+
+template <typename T>
+inline std::string CustomLib::DecToBin(T decimalNumber)
+{
+	std::bitset<sizeof(T) * 8> binaryRepresentation(decimalNumber);
+	return binaryRepresentation.to_string();
+}
+template <typename T>
+inline T CustomLib::BinToDec(const std::string& binaryString)
+{
+	std::bitset<sizeof(T) * 8> binaryRepresentation(binaryString);
+	return static_cast<T>(binaryRepresentation.to_ulong());
 }
 
 template<typename T, typename U, typename CompareFunction>

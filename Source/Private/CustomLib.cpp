@@ -77,6 +77,19 @@ bool CustomLib::IsNumber(const std::string& s)
 	return !s.empty() && std::all_of(s.begin(), s.end(), ::isdigit);
 }
 
+int CustomLib::CountOccurences(const std::string& str, const char target)
+{
+	int count = 0;
+
+	for (char ch : str) {
+		if (ch == target) {
+			count++;
+		}
+	}
+
+	return count;
+}
+
 void CustomLib::PushError(const std::string e)
 {
 	SetConsoleColor(12);

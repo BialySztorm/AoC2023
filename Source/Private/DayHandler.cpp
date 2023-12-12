@@ -6,7 +6,6 @@
 #include <thread>
 #include <numeric>
 #include <unordered_map>
-
 #include "CustomLib.h"
 #include "FileHandler.h"
 
@@ -25,6 +24,7 @@ DayHandler::DayHandler(std::string inputDir, std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day9);
 	dayFunctions.emplace_back(&DayHandler::Day10);
 	dayFunctions.emplace_back(&DayHandler::Day11);
+	dayFunctions.emplace_back(&DayHandler::Day12);
 	currentDay = dayFunctions.size();
 }
 
@@ -1110,6 +1110,52 @@ void DayHandler::Day11(FileHandler& fileHandler)
 	std::cout << "Part Two: " << distanceSum << std::endl;
 }
 
+void DayHandler::Day12(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day12.txt");
+	Day12Count = 0;
+
+	for (int i = 0; i < tab.size(); i++)
+	{
+		std::cout << i << "/" << tab.size() << "\r";
+		std::vector<std::string> tmp = CustomLib::SplitString(tab[i], ' ');
+		std::string conditionReport = tmp[0];
+		std::vector<int> damagedGroups = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tmp[1], ','));
+		Day12CountOccurencies(conditionReport, damagedGroups);
+	}
+
+	std::cout << "Part One: " << Day12Count << std::endl;
+
+	Day12Count = 0;
+	const int numThreads = 4;
+	std::vector<std::thread> threads;
+
+	for (int i = 0; i < tab.size(); i++)
+	{
+		std::cout << i << "/" << tab.size() << "\r";
+		std::vector<std::string> tmp = CustomLib::SplitString(tab[i], ' ');
+		std::string conditionReport = tmp[0] + "?" + tmp[0] + "?" + tmp[0] + "?" + tmp[0] + "?" + tmp[0];
+		std::vector<int> tmpdamagedGroups = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tmp[1], ','));
+		std::vector<int> damagedGroups;
+		for (int i = 0; i < 5; ++i) {
+			damagedGroups.insert(damagedGroups.end(), tmpdamagedGroups.begin(), tmpdamagedGroups.end());
+		}
+		threads.emplace_back(&DayHandler::Day12CountOccurencies, this, conditionReport, damagedGroups);
+		if (threads.size() >= 4)
+		{
+			threads[0].join();
+			threads.erase(threads.begin());
+		}
+		//Day12CountOccurencies(conditionReport, damagedGroups);
+	}
+	for (auto& thread : threads) {
+		thread.join();
+	}
+	threads.clear();
+
+	std::cout << "Part Two: " << Day12Count << std::endl;
+}
+
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(std::vector<std::pair<long long, long long>> tab, std::vector<std::vector<long long>> mapping)
 {
 	std::vector<std::pair<long long, long long>> tmp;
@@ -1310,4 +1356,94 @@ bool DayHandler::Day10HandlePipe(std::pair<int, int>* previousLocation, std::pai
 	currentLocation->first = nextLocation.first;
 	currentLocation->second = nextLocation.second;
 	return true;
+}
+
+void DayHandler::Day12CountOccurencies(const std::string& input, const std::vector<int>& occurrences)
+{
+	int count = 0, occurencesCount = 0, hashCount = 0, questionCount = 0;
+
+	// Count occurrences of '?'
+	for (char ch : input) {
+		if (ch == '?') {
+			questionCount++;
+		}
+		else if (ch == '#') {
+			hashCount++;
+		}
+	}
+	for (int occ : occurrences)
+		occurencesCount += occ;
+
+	if (questionCount + hashCount < occurencesCount)
+		return;
+	else if (questionCount + hashCount == occurencesCount)
+	{
+		int currentOccurence = 0, i = 0;
+		for (char ch : input)
+		{
+			if (ch == '?' || ch == '#')
+			{
+				i++;
+				if (occurrences[currentOccurence] < i)
+					return;
+			}
+			else if (i > 0)
+			{
+				if (occurrences[currentOccurence] > i)
+					return;
+				i = 0;
+				currentOccurence++;
+			}
+		}
+		Day12Count++;
+		return;
+	}
+	for (long long i = std::pow(2, occurencesCount - hashCount) - 1; i < std::pow(2, questionCount); i++)
+	{
+		std::string bin = CustomLib::DecToBin<long long>(i);
+		bin = bin.substr(bin.length() - questionCount);
+		if (CustomLib::CountOccurences(bin, '1') < occurencesCount - hashCount || CustomLib::CountOccurences(bin, '1') > occurencesCount - hashCount)
+			continue;
+		std::string tmp = input;
+		int j = 0;
+		for (int k = 0; k < tmp.length(); k++)
+		{
+			if (tmp[k] == '?')
+			{
+				if (bin[j] == '0')
+					tmp[k] = '.';
+				else
+					tmp[k] = '#';
+				j++;
+			}
+		}
+		bool valid = true;
+		j = 0;
+		int currentOccurence = 0;
+		for (char ch : tmp)
+		{
+			if (ch == '#')
+			{
+				j++;
+				if (occurrences[currentOccurence] < j)
+				{
+					valid = false;
+					break;
+				}
+			}
+			else if (j > 0)
+			{
+				if (occurrences[currentOccurence] > j)
+				{
+					valid = false;
+					break;
+				}
+				j = 0;
+				currentOccurence++;
+			}
+		}
+		if (valid)
+			count++;
+	}
+	Day12Count += count;
 }

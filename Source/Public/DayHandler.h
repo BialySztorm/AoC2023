@@ -18,6 +18,8 @@ private:
 	std::vector<std::string> dayNames;
 	FileHandler* fileHandler;
 
+	long long Day12Count;
+
 	// Main day functions
 	void Day1(FileHandler& fileHandler);
 	void Day2(FileHandler& fileHandler);
@@ -30,9 +32,11 @@ private:
 	void Day9(FileHandler& fileHandler);
 	void Day10(FileHandler& fileHandler);
 	void Day11(FileHandler& fileHandler);
+	void Day12(FileHandler& fileHandler);
 
 	// Additional day functions
 	std::vector<std::pair<long long, long long>> Day5ApplyRange(std::vector<std::pair<long long, long long>> tab, std::vector<std::vector<long long>> mapping);
 	int Day7GetType(std::string type, bool activeJokers = false) const;
 	bool Day10HandlePipe(std::pair<int, int>* previousLocation, std::pair<int, int>* currentLocation, const std::vector<std::string> map);
+	void Day12CountOccurencies(const std::string& input, const std::vector<int>& occurrences);
 };
