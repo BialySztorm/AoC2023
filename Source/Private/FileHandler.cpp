@@ -1,6 +1,7 @@
 #include "FileHandler.h"
 #include <filesystem>
 #include <iostream>
+#include <fstream>
 
 #include "CustomLib.h"
 
@@ -85,4 +86,18 @@ bool FileHandler::WriteFile(const std::string fileName, const std::vector<std::v
 	}
 	CustomLib::PushError("Error while creating file: " + outputDir + fileName);
 	return false;
+}
+
+nlohmann::json FileHandler::ReadJsonFileStruct(const std::string fileName) const
+{
+	std::ifstream file(inputDir + fileName);
+	if (!file.is_open()) {
+		throw std::runtime_error("Unable to open file: " + inputDir + fileName);
+	}
+
+	nlohmann::json jsonData;
+	file >> jsonData;
+	file.close();
+
+	return jsonData;
 }

@@ -2,7 +2,6 @@
 #include <vector>
 #include <string>
 #include <json.hpp>
-#include <fstream>
 
 class FileHandler
 {
@@ -17,6 +16,7 @@ public:
 	std::vector<std::string> ReadFile(const std::string fileName) const;
 	bool WriteFile(const std::string fileName, const std::vector<std::string> content) const;
 	bool WriteFile(const std::string fileName, const std::vector<std::vector<char>> content) const;
+	nlohmann::json ReadJsonFileStruct(const std::string fileName) const;
 	template <typename T>
 	T ReadJsonFile(const std::string& fileName);
 };
@@ -24,14 +24,6 @@ public:
 template<typename T>
 inline T FileHandler::ReadJsonFile(const std::string& fileName)
 {
-	std::ifstream file(inputDir + fileName);
-	if (!file.is_open()) {
-		throw std::runtime_error("Unable to open file: " + inputDir + fileName);
-	}
-
-	nlohmann::json jsonData;
-	file >> jsonData;
-	file.close();
-
+	nlohmann::json jsonData = ReadJsonFileStruct(fileName);
 	return jsonData.get<T>();
 }
