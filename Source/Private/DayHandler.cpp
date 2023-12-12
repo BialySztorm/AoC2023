@@ -5,7 +5,6 @@
 #include <cmath>
 #include <thread>
 #include <numeric>
-#include <unordered_map>
 #include "CustomLib.h"
 #include "FileHandler.h"
 
@@ -447,7 +446,7 @@ void DayHandler::Day4(FileHandler& fileHandler)
 		}
 		if (multiply > 0)
 		{
-			points += std::pow(2, multiply - 1);
+			points += std::floor(std::pow(2, multiply - 1));
 		}
 	}
 	std::cout << "Part One: " << points << std::endl;
@@ -585,8 +584,8 @@ void DayHandler::Day6(FileHandler& fileHandler) {
 			if ((times[i] - j) * j > distances[i])
 				currentMargin++;
 		}
-		if (margin > 0);
-		margin *= currentMargin;
+		if (margin > 0)
+			margin *= currentMargin;
 	}
 
 	std::cout << "Part One: " << margin << std::endl;
@@ -1113,26 +1112,26 @@ void DayHandler::Day11(FileHandler& fileHandler)
 void DayHandler::Day12(FileHandler& fileHandler)
 {
 	std::vector<std::string> tab = fileHandler.ReadFile("day12.txt");
-	Day12Count = 0;
+	long long count = 0;
+	size_t tabSize = tab.size();
 
-	for (int i = 0; i < tab.size(); i++)
+	for (int i = 0; i < tabSize; i++)
 	{
-		std::cout << i << "/" << tab.size() << "\r";
+		std::cout << i << "/" << tabSize << "\r";
 		std::vector<std::string> tmp = CustomLib::SplitString(tab[i], ' ');
 		std::string conditionReport = tmp[0];
 		std::vector<int> damagedGroups = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tmp[1], ','));
-		Day12CountOccurencies(conditionReport, damagedGroups);
+		RP.clear();
+		count += Day12CountOccurencies(conditionReport, damagedGroups);
 	}
 
-	std::cout << "Part One: " << Day12Count << std::endl;
+	std::cout << "Part One: " << count << std::endl;
 
-	Day12Count = 0;
-	const int numThreads = 4;
-	std::vector<std::thread> threads;
+	count = 0;
 
-	for (int i = 0; i < tab.size(); i++)
+	for (int i = 0; i < tabSize; i++)
 	{
-		std::cout << i << "/" << tab.size() << "\r";
+		std::cout << i << "/" << tabSize << "\r";
 		std::vector<std::string> tmp = CustomLib::SplitString(tab[i], ' ');
 		std::string conditionReport = tmp[0] + "?" + tmp[0] + "?" + tmp[0] + "?" + tmp[0] + "?" + tmp[0];
 		std::vector<int> tmpdamagedGroups = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tmp[1], ','));
@@ -1140,20 +1139,12 @@ void DayHandler::Day12(FileHandler& fileHandler)
 		for (int i = 0; i < 5; ++i) {
 			damagedGroups.insert(damagedGroups.end(), tmpdamagedGroups.begin(), tmpdamagedGroups.end());
 		}
-		threads.emplace_back(&DayHandler::Day12CountOccurencies, this, conditionReport, damagedGroups);
-		if (threads.size() >= 4)
-		{
-			threads[0].join();
-			threads.erase(threads.begin());
-		}
+		RP.clear();
+		count += Day12CountOccurencies(conditionReport, damagedGroups);
 		//Day12CountOccurencies(conditionReport, damagedGroups);
 	}
-	for (auto& thread : threads) {
-		thread.join();
-	}
-	threads.clear();
 
-	std::cout << "Part Two: " << Day12Count << std::endl;
+	std::cout << "Part Two: " << count << std::endl;
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(std::vector<std::pair<long long, long long>> tab, std::vector<std::vector<long long>> mapping)
@@ -1358,92 +1349,40 @@ bool DayHandler::Day10HandlePipe(std::pair<int, int>* previousLocation, std::pai
 	return true;
 }
 
-void DayHandler::Day12CountOccurencies(const std::string& input, const std::vector<int>& occurrences)
+long long DayHandler::Day12CountOccurencies(const std::string& conditionReport, const std::vector<int>& damagedGroups, long long i, long long gi, long long current)
 {
-	int count = 0, occurencesCount = 0, hashCount = 0, questionCount = 0;
+	std::tuple<long long, long long, long long> key = std::make_tuple(i, gi, current);
+	if (RP.find(key) != RP.end()) {
+		return RP[key];
+	}
 
-	// Count occurrences of '?'
-	for (char ch : input) {
-		if (ch == '?') {
-			questionCount++;
+	if (i == conditionReport.length()) {
+		if (gi == damagedGroups.size() && current == 0) {
+			return 1;
 		}
-		else if (ch == '#') {
-			hashCount++;
+		else if (gi == damagedGroups.size() - 1 && damagedGroups[gi] == current) {
+			return 1;
+		}
+		else {
+			return 0;
 		}
 	}
-	for (int occ : occurrences)
-		occurencesCount += occ;
 
-	if (questionCount + hashCount < occurencesCount)
-		return;
-	else if (questionCount + hashCount == occurencesCount)
-	{
-		int currentOccurence = 0, i = 0;
-		for (char ch : input)
-		{
-			if (ch == '?' || ch == '#')
-			{
-				i++;
-				if (occurrences[currentOccurence] < i)
-					return;
+	long long ans = 0;
+	for (char c : {'.', '#'}) {
+		if (conditionReport[i] == c || conditionReport[i] == '?') {
+			if (c == '.' && current == 0) {
+				ans += Day12CountOccurencies(conditionReport, damagedGroups, i + 1, gi, 0);
 			}
-			else if (i > 0)
-			{
-				if (occurrences[currentOccurence] > i)
-					return;
-				i = 0;
-				currentOccurence++;
+			else if (c == '.' && current > 0 && gi < damagedGroups.size() && damagedGroups[gi] == current) {
+				ans += Day12CountOccurencies(conditionReport, damagedGroups, i + 1, gi + 1, 0);
+			}
+			else if (c == '#') {
+				ans += Day12CountOccurencies(conditionReport, damagedGroups, i + 1, gi, current + 1);
 			}
 		}
-		Day12Count++;
-		return;
 	}
-	for (long long i = std::pow(2, occurencesCount - hashCount) - 1; i < std::pow(2, questionCount); i++)
-	{
-		std::string bin = CustomLib::DecToBin<long long>(i);
-		bin = bin.substr(bin.length() - questionCount);
-		if (CustomLib::CountOccurences(bin, '1') < occurencesCount - hashCount || CustomLib::CountOccurences(bin, '1') > occurencesCount - hashCount)
-			continue;
-		std::string tmp = input;
-		int j = 0;
-		for (int k = 0; k < tmp.length(); k++)
-		{
-			if (tmp[k] == '?')
-			{
-				if (bin[j] == '0')
-					tmp[k] = '.';
-				else
-					tmp[k] = '#';
-				j++;
-			}
-		}
-		bool valid = true;
-		j = 0;
-		int currentOccurence = 0;
-		for (char ch : tmp)
-		{
-			if (ch == '#')
-			{
-				j++;
-				if (occurrences[currentOccurence] < j)
-				{
-					valid = false;
-					break;
-				}
-			}
-			else if (j > 0)
-			{
-				if (occurrences[currentOccurence] > j)
-				{
-					valid = false;
-					break;
-				}
-				j = 0;
-				currentOccurence++;
-			}
-		}
-		if (valid)
-			count++;
-	}
-	Day12Count += count;
+
+	RP[key] = ans;
+	return ans;
 }

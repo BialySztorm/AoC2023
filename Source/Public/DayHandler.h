@@ -2,8 +2,20 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 class FileHandler;
+
+struct TupleHash {
+	template <class T1, class T2, class T3>
+	std::size_t operator () (const std::tuple<T1, T2, T3>& p) const {
+		auto h1 = std::hash<T1>{}(std::get<0>(p));
+		auto h2 = std::hash<T2>{}(std::get<1>(p));
+		auto h3 = std::hash<T3>{}(std::get<2>(p));
+
+		return h1 ^ h2 ^ h3;
+	}
+};
 
 class DayHandler
 {
@@ -18,7 +30,7 @@ private:
 	std::vector<std::string> dayNames;
 	FileHandler* fileHandler;
 
-	long long Day12Count;
+	std::unordered_map<std::tuple<long long, long long, long long>, long long, TupleHash> RP;
 
 	// Main day functions
 	void Day1(FileHandler& fileHandler);
@@ -38,5 +50,5 @@ private:
 	std::vector<std::pair<long long, long long>> Day5ApplyRange(std::vector<std::pair<long long, long long>> tab, std::vector<std::vector<long long>> mapping);
 	int Day7GetType(std::string type, bool activeJokers = false) const;
 	bool Day10HandlePipe(std::pair<int, int>* previousLocation, std::pair<int, int>* currentLocation, const std::vector<std::string> map);
-	void Day12CountOccurencies(const std::string& input, const std::vector<int>& occurrences);
+	long long Day12CountOccurencies(const std::string& conditionReport, const std::vector<int>& damagedGroups, long long i = 0, long long gi = 0, long long current = 0);
 };
