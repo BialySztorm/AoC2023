@@ -24,6 +24,7 @@ DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day10);
 	dayFunctions.emplace_back(&DayHandler::Day11);
 	dayFunctions.emplace_back(&DayHandler::Day12);
+	dayFunctions.emplace_back(&DayHandler::Day13);
 	currentDay = dayFunctions.size();
 }
 
@@ -1186,6 +1187,207 @@ void DayHandler::Day12(FileHandler& fileHandler)
 		RP.clear();
 		count += Day12CountOccurencies(conditionReport, damagedGroups);
 		//Day12CountOccurencies(conditionReport, damagedGroups);
+	}
+
+	std::cout << "Part Two: " << count << std::endl;
+}
+
+void DayHandler::Day13(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day13.txt");
+	std::vector<std::vector<std::string>> patterns;
+	long long count = 0;
+	std::vector<long long> counts;
+	patterns.push_back({});
+	{
+		int i = 0;
+		for (std::string line : tab)
+		{
+			if (line == "")
+			{
+				patterns.push_back({});
+				i++;
+			}
+			else
+			{
+				patterns[i].push_back(line);
+			}
+		}
+	}
+	size_t tabSize = patterns.size();
+	for (int i = 0; i < tabSize; i++)
+	{
+		std::cout << i << "/" << tabSize << "\r";
+		std::vector<std::string> pattern = patterns[i];
+		bool mirrorFound = false;
+		for (int j = 0; j < pattern.size() - 1; j++)
+		{
+			if (pattern[j] == pattern[j + 1])
+			{
+				mirrorFound = true;
+				for (int k = 1; k < std::min(j + 1, static_cast<int>(pattern.size() - j - 1)); k++)
+				{
+					if (pattern[j - k] != pattern[j + 1 + k])
+					{
+						mirrorFound = false;
+						break;
+					}
+				}
+			}
+			if (mirrorFound)
+			{
+				count += (j + 1) * 100;
+				counts.push_back((j + 1) * 100);
+				break;
+			}
+		}
+		if (mirrorFound)
+			continue;
+
+		for (int j = 0; j < pattern[0].length() - 1; j++)
+		{
+			bool arePatternsEqual = true;
+			for (int k = 0; k < pattern.size(); k++)
+			{
+				if (pattern[k][j] != pattern[k][j + 1])
+				{
+					arePatternsEqual = false;
+					break;
+				}
+			}
+			if (arePatternsEqual == true)
+			{
+				mirrorFound = true;
+				for (int k = 1; k < std::min(j + 1, static_cast<int>(pattern[0].length() - j - 1)); k++)
+				{
+					for (std::string line : pattern)
+					{
+						if (line[j - k] != line[j + k + 1])
+						{
+							mirrorFound = false;
+							break;
+						}
+					}
+					if (!mirrorFound)
+						break;
+				}
+				if (mirrorFound)
+				{
+					count += (j + 1);
+					counts.push_back(j + 1);
+					break;
+				}
+			}
+		}
+	}
+
+	std::cout << "Part One: " << count << std::endl;
+	count = 0;
+
+	for (int i = 0; i < tabSize; i++)
+	{
+		std::cout << i << "/" << tabSize << "\r";
+		std::vector<std::string> pattern = patterns[i];
+		bool mirrorFound = false;
+		for (int j = 0; j < pattern.size() - 1; j++)
+		{
+			int smudges = 0;
+			bool arePatternsEqual = true;
+			// pattern[j] == pattern[j + 1]
+			for (int k = 0; k < pattern[j].length(); k++)
+			{
+				if (pattern[j][k] != pattern[j + 1][k])
+				{
+					smudges++;
+					if (smudges > 1)
+					{
+						arePatternsEqual = false;
+						break;
+					}
+				}
+			}
+			if (arePatternsEqual)
+			{
+				mirrorFound = true;
+				for (int k = 1; k < std::min(j + 1, static_cast<int>(pattern.size() - j - 1)); k++)
+				{
+					for (int l = 0; l < pattern[j - k].length(); l++)
+					{
+						if (pattern[j - k][l] != pattern[j + 1 + k][l])
+						{
+							smudges++;
+							if (smudges > 1)
+							{
+								mirrorFound = false;
+								break;
+							}
+						}
+					}
+					if (!mirrorFound)
+						break;
+				}
+			}
+			if (mirrorFound)
+			{
+				if (counts[i] == (j + 1) * 100)
+					mirrorFound = false;
+				else
+				{
+					count += ((j + 1) * 100);
+					break;
+				}
+			}
+		}
+		if (mirrorFound)
+			continue;
+		for (int j = 0; j < pattern[0].length() - 1; j++)
+		{
+			bool arePatternsEqual = true;
+			int smudges = 0;
+			for (int k = 0; k < pattern.size(); k++)
+			{
+				if (pattern[k][j] != pattern[k][j + 1])
+				{
+					smudges++;
+					if (smudges > 1)
+					{
+						arePatternsEqual = false;
+						break;
+					}
+				}
+			}
+			if (arePatternsEqual == true)
+			{
+				mirrorFound = true;
+				for (int k = 1; k < std::min(j + 1, static_cast<int>(pattern[0].length() - j - 1)); k++)
+				{
+					for (std::string line : pattern)
+					{
+						if (line[j - k] != line[j + k + 1])
+						{
+							smudges++;
+							if (smudges > 1)
+							{
+								mirrorFound = false;
+								break;
+							}
+						}
+					}
+					if (!mirrorFound)
+						break;
+				}
+				if (mirrorFound)
+				{
+					if (counts[i] == (j + 1))
+						mirrorFound = false;
+					else
+					{
+						count += (j + 1);
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	std::cout << "Part Two: " << count << std::endl;
