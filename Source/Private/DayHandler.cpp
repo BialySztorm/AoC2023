@@ -25,6 +25,7 @@ DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day11);
 	dayFunctions.emplace_back(&DayHandler::Day12);
 	dayFunctions.emplace_back(&DayHandler::Day13);
+	dayFunctions.emplace_back(&DayHandler::Day14);
 	currentDay = dayFunctions.size();
 }
 
@@ -1387,6 +1388,173 @@ void DayHandler::Day13(FileHandler& fileHandler)
 					}
 				}
 			}
+		}
+	}
+
+	std::cout << "Part Two: " << count << std::endl;
+}
+
+void DayHandler::Day14(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day14.txt");
+	std::vector<std::string> tab1 = tab;
+	std::vector<std::string> tab2 = tab;
+	size_t tabSize = tab1[0].length();
+	for (int i = 0; i < tab1[0].length(); i++)
+	{
+		std::cout << i << "/" << tabSize << "\r";
+		for (int j = 0; j < tab1.size(); j++)
+		{
+			if (tab1[j][i] == 'O')
+			{
+				if (j != 0)
+					tab1[j][i] = '.';
+				for (int k = j - 1; k >= 0; k--)
+				{
+					if (tab1[k][i] == 'O' || tab1[k][i] == '#')
+					{
+						tab1[k + 1][i] = 'O';
+						break;
+					}
+					else if (k == 0)
+						tab1[k][i] = 'O';
+				}
+			}
+		}
+	}
+	//fileHandler.WriteFile("Day14Map.txt", tab);
+	tabSize = tab1.size();
+	long long count = 0;
+	for (int i = 0; i < tab1.size(); i++)
+	{
+		std::cout << i << "/" << tabSize << "\r";
+		for (int j = 0; j < tab1[i].length(); j++)
+		{
+			if (tab1[i][j] == 'O')
+				count += tabSize - i;
+		}
+	}
+
+	std::cout << "Part One: " << count << std::endl;
+
+	std::vector<std::vector<std::string>> previousTabs;
+	previousTabs.push_back(tab2);
+	long long lastRollIndex = 0, previousTabLastRollIndex = 0;
+	for (int i = 0; i < 1000000000; i++)
+	{
+		std::cout << i << "/1000000000\r";
+		for (int j = 0; j < tab2[0].length(); j++)
+		{
+			for (int k = 0; k < tab2.size(); k++)
+			{
+				if (tab2[k][j] == 'O')
+				{
+					if (k != 0)
+						tab2[k][j] = '.';
+					for (int l = k - 1; l >= 0; l--)
+					{
+						if (tab2[l][j] == 'O' || tab2[l][j] == '#')
+						{
+							tab2[l + 1][j] = 'O';
+							break;
+						}
+						else if (l == 0)
+							tab2[l][j] = 'O';
+					}
+				}
+			}
+		}
+		for (int j = 0; j < tab2.size(); j++)
+		{
+			for (int k = 0; k < tab2[j].length(); k++)
+			{
+				if (tab2[j][k] == 'O')
+				{
+					if (k != 0)
+						tab2[j][k] = '.';
+					for (int l = k - 1; l >= 0; l--)
+					{
+						if (tab2[j][l] == 'O' || tab2[j][l] == '#')
+						{
+							tab2[j][l + 1] = 'O';
+							break;
+						}
+						else if (l == 0)
+							tab2[j][l] = 'O';
+					}
+				}
+			}
+		}
+		for (int j = tab2[0].length() - 1; j >= 0; j--)
+		{
+			for (int k = tab2.size() - 1; k >= 0; k--)
+			{
+				if (tab2[k][j] == 'O')
+				{
+					if (k != tab2.size() - 1)
+						tab2[k][j] = '.';
+					for (int l = k + 1; l < tab2.size(); l++)
+					{
+						if (tab2[l][j] == 'O' || tab2[l][j] == '#')
+						{
+							tab2[l - 1][j] = 'O';
+							break;
+						}
+						else if (l == tab2.size() - 1)
+							tab2[l][j] = 'O';
+					}
+				}
+			}
+		}
+		for (int j = tab2.size() - 1; j >= 0; j--)
+		{
+			for (int k = tab2[j].length() - 1; k >= 0; k--)
+			{
+				if (tab2[j][k] == 'O')
+				{
+					if (k != tab2[j].length() - 1)
+						tab2[j][k] = '.';
+					for (int l = k + 1; l < tab2[j].length(); l++)
+					{
+						if (tab2[j][l] == 'O' || tab2[j][l] == '#')
+						{
+							tab2[j][l - 1] = 'O';
+							break;
+						}
+						else if (l == tab2[j].length() - 1)
+							tab2[j][l] = 'O';
+					}
+				}
+			}
+		}
+		bool tabExists = false;
+		for (int j = 0; j < previousTabs.size(); j++)
+		{
+			if (previousTabs[j] == tab2)
+			{
+				previousTabLastRollIndex = j;
+				tabExists = true;
+				break;
+			}
+		}
+		if (tabExists)
+		{
+			lastRollIndex = i;
+			break;
+		}
+		previousTabs.push_back(tab2);
+	}
+	tab2 = previousTabs[previousTabLastRollIndex + (1000000000 - lastRollIndex - 1) % (previousTabs.size() - previousTabLastRollIndex)];
+
+	tabSize = tab2.size();
+	count = 0;
+	for (int i = 0; i < tab2.size(); i++)
+	{
+		std::cout << i << "/" << tabSize << "\r";
+		for (int j = 0; j < tab2[i].length(); j++)
+		{
+			if (tab2[i][j] == 'O')
+				count += tabSize - i;
 		}
 	}
 
