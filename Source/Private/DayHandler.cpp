@@ -26,6 +26,7 @@ DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day12);
 	dayFunctions.emplace_back(&DayHandler::Day13);
 	dayFunctions.emplace_back(&DayHandler::Day14);
+	dayFunctions.emplace_back(&DayHandler::Day15);
 	currentDay = dayFunctions.size();
 }
 
@@ -1559,6 +1560,87 @@ void DayHandler::Day14(FileHandler& fileHandler)
 	}
 
 	std::cout << "Part Two: " << count << std::endl;
+}
+
+void DayHandler::Day15(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day15.txt");
+	tab = CustomLib::SplitString(tab[0], ',');
+
+	long long sum = 0;
+	for (std::string text : tab)
+	{
+		long long hash = 0;
+		for (char tmp : text)
+		{
+			hash += tmp;
+			hash *= 17;
+			hash %= 256;
+		}
+		sum += hash;
+	}
+
+	std::cout << "Part One: " << sum << std::endl;
+
+	std::vector<std::vector<std::pair<std::string, int>>> container;
+	for (int i = 0; i < 256; i++)
+		container.push_back({});
+	for (std::string text : tab)
+	{
+		if (text[text.length() - 1] == '-')
+		{
+			std::string tmp = text.substr(0, text.length() - 1);
+			long long hash = 0;
+			for (char tmp1 : tmp)
+			{
+				hash += tmp1;
+				hash *= 17;
+				hash %= 256;
+			}
+			for (int i = 0; i < container[hash].size(); i++)
+			{
+				if (container[hash][i].first == tmp)
+				{
+					container[hash].erase(container[hash].begin() + i);
+					break;
+				}
+			}
+		}
+		else
+		{
+			std::string tmp = text.substr(0, text.length() - 2);
+			long long hash = 0;
+			bool isChanged = false;
+			for (char tmp1 : tmp)
+			{
+				hash += tmp1;
+				hash *= 17;
+				hash %= 256;
+			}
+			for (int i = 0; i < container[hash].size(); i++)
+			{
+				if (container[hash][i].first == tmp)
+				{
+					container[hash][i].second = std::stoi(text.substr(text.length() - 1, 1));
+					isChanged = true;
+					break;
+				}
+			}
+			if (!isChanged)
+				container[hash].push_back({ tmp,std::stoi(text.substr(text.length() - 1, 1)) });
+		}
+	}
+
+	long long focusingPower = 0;
+	for (int i = 0; i < container.size(); i++)
+	{
+		for (int j = 0; j < container[i].size(); j++)
+		{
+			focusingPower += (i + 1) * (j + 1) * container[i][j].second;
+		}
+	}
+
+	std::cout << "Part Two: " << focusingPower << std::endl;
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const
