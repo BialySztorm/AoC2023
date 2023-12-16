@@ -27,6 +27,7 @@ DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day13);
 	dayFunctions.emplace_back(&DayHandler::Day14);
 	dayFunctions.emplace_back(&DayHandler::Day15);
+	dayFunctions.emplace_back(&DayHandler::Day16);
 	currentDay = dayFunctions.size();
 }
 
@@ -1643,6 +1644,73 @@ void DayHandler::Day15(FileHandler& fileHandler)
 	std::cout << "Part Two: " << focusingPower << std::endl;
 }
 
+void DayHandler::Day16(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day16.txt");
+	std::vector<std::string> map = tab;
+
+	Day16DrawMap(map, tab);
+	long int count = 0;
+
+	//fileHandler.WriteFile("Day16Map.txt", map);
+
+	for (std::string line : map)
+		for (char tmp : line)
+			if (tmp == '#')
+				count++;
+
+	std::cout << "Part One: " << count << std::endl;
+	count = 0;
+	size_t tabSize = tab.size() * 2 + tab[0].length() * 2;
+
+	for (int i = 0; i < tab.size(); i++)
+	{
+		std::cout << i * 2 << "/" << tabSize << "\r";
+		std::vector<std::string> tmp1 = tab;
+		Day16DrawMap(tmp1, tab, i, 0, 0, 1);
+		long int tmpCount = 0;
+		for (std::string line : tmp1)
+			for (char tmp : line)
+				if (tmp == '#')
+					tmpCount++;
+		count = std::max(count, tmpCount);
+		tmpCount = 0;
+
+		std::cout << i * 2 + 1 << "/" << tabSize << "\r";
+		std::vector<std::string> tmp2 = tab;
+		Day16DrawMap(tmp2, tab, i, tmp2.size() - 1, 0, -1);
+		for (std::string line : tmp2)
+			for (char tmp : line)
+				if (tmp == '#')
+					tmpCount++;
+		count = std::max(count, tmpCount);
+	}
+	for (int i = 0; i < tab[0].length(); i++)
+	{
+		std::cout << i * 2 + tab.size() * 2 << "/" << tabSize << "\r";
+		std::vector<std::string> tmp1 = tab;
+		Day16DrawMap(tmp1, tab, 0, i);
+		long int tmpCount = 0;
+		for (std::string line : tmp1)
+			for (char tmp : line)
+				if (tmp == '#')
+					tmpCount++;
+		count = std::max(count, tmpCount);
+		tmpCount = 0;
+
+		std::cout << i * 2 + tab.size() * 2 + 1 << "/" << tabSize << "\r";
+		std::vector<std::string> tmp2 = tab;
+		Day16DrawMap(tmp2, tab, tmp2[0].length() - 1, i, -1);
+		for (std::string line : tmp2)
+			for (char tmp : line)
+				if (tmp == '#')
+					tmpCount++;
+		count = std::max(count, tmpCount);
+	}
+
+	std::cout << "Part Two: " << count << std::endl;
+}
+
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const
 {
 	std::vector<std::pair<long long, long long>> tmp, tab1 = tab;
@@ -1881,4 +1949,101 @@ long long DayHandler::Day12CountOccurencies(const std::string& conditionReport, 
 
 	RP[key] = ans;
 	return ans;
+}
+
+void DayHandler::Day16DrawMap(std::vector<std::string>& map, const std::vector<std::string> tab, int x, int y, int dx, int dy)
+{
+	while (true)
+	{
+		if (x < 0 || x >= map[0].length() || y < 0 || y >= map.size())
+			return;
+		if (tab[y][x] == '.')
+		{
+			map[y][x] = '#';
+			x += dx;
+			y += dy;
+		}
+		else if (tab[y][x] == '/')
+		{
+			map[y][x] = '#';
+			if (dx == 1)
+			{
+				dx = 0;
+				dy = -1;
+			}
+			else if (dx == -1)
+			{
+				dx = 0;
+				dy = 1;
+			}
+			else if (dy == 1)
+			{
+				dx = -1;
+				dy = 0;
+			}
+			else if (dy == -1)
+			{
+				dx = 1;
+				dy = 0;
+			}
+			x += dx;
+			y += dy;
+		}
+		else if (tab[y][x] == '\\')
+		{
+			map[y][x] = '#';
+			if (dx == 1)
+			{
+				dx = 0;
+				dy = 1;
+			}
+			else if (dx == -1)
+			{
+				dx = 0;
+				dy = -1;
+			}
+			else if (dy == 1)
+			{
+				dx = 1;
+				dy = 0;
+			}
+			else if (dy == -1)
+			{
+				dx = -1;
+				dy = 0;
+			}
+			x += dx;
+			y += dy;
+		}
+		else if (tab[y][x] == '-')
+		{
+			if (map[y][x] == '#' && ((y > 0 && map[y - 1][x] == '#') || (y < map.size() - 1 && map[y + 1][x] == '#')))
+				return;
+			map[y][x] = '#';
+			if (dy == 0)
+				x += dx;
+			else
+			{
+				Day16DrawMap(map, tab, x + 1, y, 1, 0);
+				Day16DrawMap(map, tab, x - 1, y, -1, 0);
+				return;
+			}
+		}
+		else if (tab[y][x] == '|')
+		{
+			if (map[y][x] == '#' && ((x > 0 && map[y][x - 1] == '#') || (x < map[0].length() - 1 && map[y][x + 1] == '#')))
+				return;
+			map[y][x] = '#';
+			if (dx == 0)
+				y += dy;
+			else
+			{
+				Day16DrawMap(map, tab, x, y + 1, 0, 1);
+				Day16DrawMap(map, tab, x, y - 1, 0, -1);
+				return;
+			}
+		}
+		else
+			std::cout << "ERROR" << std::endl;
+	}
 }
