@@ -5,6 +5,9 @@
 #include <cmath>
 #include <thread>
 #include <numeric>
+#include <limits>
+#include <unordered_map>
+#include <queue>
 #include "CustomLib.h"
 #include "FileHandler.h"
 
@@ -28,6 +31,7 @@ DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day14);
 	dayFunctions.emplace_back(&DayHandler::Day15);
 	dayFunctions.emplace_back(&DayHandler::Day16);
+	dayFunctions.emplace_back(&DayHandler::Day17);
 	currentDay = dayFunctions.size();
 }
 
@@ -1709,6 +1713,109 @@ void DayHandler::Day16(FileHandler& fileHandler)
 	}
 
 	std::cout << "Part Two: " << count << std::endl;
+}
+
+struct State {
+	int distance, height, width, direction, indirection;
+	bool operator<(const State& o) const {
+		return distance > o.distance;
+	}
+};
+
+void DayHandler::Day17(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day17.txt");
+	std::vector<std::vector<int>> map;
+	for (std::string line : tab)
+	{
+		map.push_back({});
+		for (char tmp : line)
+			map[map.size() - 1].push_back(tmp - '0');
+	}
+
+	size_t mapHeight = map.size();
+	size_t mapWidth = map[0].size();
+	std::priority_queue<State> queue;
+	queue.push({ 0, 0, 0, -1, -1 });
+	std::unordered_map<std::string, int> distancemap;
+
+	while (!queue.empty())
+	{
+		State s = queue.top();
+		queue.pop();
+		std::string  key = std::to_string(s.height) + "," + std::to_string(s.width) + "," + std::to_string(s.direction) + "," + std::to_string(s.indirection);
+		if (distancemap.find(key) != distancemap.end())
+			continue;
+		distancemap[key] = s.distance;
+		std::vector<std::vector<int>> directions = { {-1,0},{0,1},{1,0},{0,-1} };
+		for (int i = 0; i < directions.size(); i++)
+		{
+			int height = s.height + directions[i][0];
+			int width = s.width + directions[i][1];
+			int newDirection = i;
+			int newIndirection = (newDirection != s.direction) ? 1 : s.indirection + 1;
+
+			bool isNotReverse = ((newDirection + 2) % 4 != s.direction);
+			bool isValid = (newIndirection <= 3);
+
+			if (0 <= height && height < mapHeight && 0 <= width && width < mapWidth && isNotReverse && isValid)
+			{
+				int cost = map[height][width];
+				queue.push({ s.distance + cost, height, width, newDirection, newIndirection });
+			}
+		}
+	}
+
+	long long minHeatLoss = std::numeric_limits<long long>::max();
+	for (auto& key : distancemap)
+	{
+		std::vector<int> tmp = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(key.first, ','));
+		if (tmp[0] == mapHeight - 1 && tmp[1] == mapWidth - 1)
+			minHeatLoss = std::min(minHeatLoss, static_cast<long long>(key.second));
+	}
+
+	std::cout << "Part One: " << minHeatLoss << std::endl;
+
+	queue = std::priority_queue<State>();
+	queue.push({ 0, 0, 0, -1, -1 });
+	distancemap.clear();
+
+	while (!queue.empty())
+	{
+		State s = queue.top();
+		queue.pop();
+		std::string  key = std::to_string(s.height) + "," + std::to_string(s.width) + "," + std::to_string(s.direction) + "," + std::to_string(s.indirection);
+		if (distancemap.find(key) != distancemap.end())
+			continue;
+		distancemap[key] = s.distance;
+		std::vector<std::vector<int>> directions = { {-1,0},{0,1},{1,0},{0,-1} };
+		for (int i = 0; i < directions.size(); i++)
+		{
+			int height = s.height + directions[i][0];
+			int width = s.width + directions[i][1];
+			int newDirection = i;
+			int newIndirection = (newDirection != s.direction) ? 1 : s.indirection + 1;
+
+			bool isNotReverse = ((newDirection + 2) % 4 != s.direction);
+			bool isValid = (newIndirection <= 10 && (newDirection == s.direction || s.indirection >= 4 || s.indirection == -1));
+
+			if (0 <= height && height < mapHeight && 0 <= width && width < mapWidth && isNotReverse && isValid)
+			{
+				int cost = map[height][width];
+				queue.push({ s.distance + cost, height, width, newDirection, newIndirection });
+			}
+		}
+	}
+
+	minHeatLoss = std::numeric_limits<long long>::max();
+	for (auto& key : distancemap)
+	{
+		std::vector<int> tmp = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(key.first, ','));
+		if (tmp[0] == mapHeight - 1 && tmp[1] == mapWidth - 1)
+			minHeatLoss = std::min(minHeatLoss, static_cast<long long>(key.second));
+	}
+
+	std::cout << "Part Two: " << minHeatLoss << std::endl;
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const

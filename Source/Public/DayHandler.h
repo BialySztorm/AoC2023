@@ -49,6 +49,7 @@ private:
 	void Day14(FileHandler& fileHandler);
 	void Day15(FileHandler& fileHandler);
 	void Day16(FileHandler& fileHandler);
+	void Day17(FileHandler& fileHandler);
 
 	// Additional day functions
 	std::vector<std::pair<long long, long long>> Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const;
