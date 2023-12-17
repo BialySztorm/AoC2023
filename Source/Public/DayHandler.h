@@ -6,17 +6,6 @@
 
 class FileHandler;
 
-struct TupleHash {
-	template <class T1, class T2, class T3>
-	std::size_t operator () (const std::tuple<T1, T2, T3>& p) const {
-		auto h1 = std::hash<T1>{}(std::get<0>(p));
-		auto h2 = std::hash<T2>{}(std::get<1>(p));
-		auto h3 = std::hash<T3>{}(std::get<2>(p));
-
-		return h1 ^ h2 ^ h3;
-	}
-};
-
 class DayHandler
 {
 public:
@@ -24,6 +13,16 @@ public:
 	void HandleDay(const int day);
 	int getCurrentDay() const;
 private:
+	struct TupleHash {
+		template <class T1, class T2, class T3>
+		std::size_t operator () (const std::tuple<T1, T2, T3>& p) const {
+			auto h1 = std::hash<T1>{}(std::get<0>(p));
+			auto h2 = std::hash<T2>{}(std::get<1>(p));
+			auto h3 = std::hash<T3>{}(std::get<2>(p));
+
+			return h1 ^ h2 ^ h3;
+		}
+	};
 	// private variables
 	int currentDay;
 	std::vector<void (DayHandler::*)(FileHandler&)> dayFunctions;
