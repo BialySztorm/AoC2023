@@ -12,6 +12,10 @@ public:
 	static std::vector<std::string> SplitString(const std::string& input, const char delimiter, std::vector<int> unnecesaryColumns);
 	static std::vector<std::string> SplitString(const std::string& input, const std::vector<char> delimiters);
 	static std::vector<std::string> SplitString(const std::string& input, const std::vector<char> delimiters, std::vector<int> unnecesaryColumns);
+	static std::vector<std::vector<std::string>> SplitString(const std::vector<std::string>& input, const char delimiter);
+	static std::vector<std::vector<std::string>> SplitString(const std::vector<std::string>& input, const char delimiter, std::vector<int> unnecesaryColumns);
+	static std::vector<std::vector<std::string>> SplitString(const std::vector<std::string>& input, const std::vector<char> delimiters);
+	static std::vector<std::vector<std::string>> SplitString(const std::vector<std::string>& input, const std::vector<char> delimiters, std::vector<int> unnecesaryColumns);
 	static bool IsWithinRange(const int point, const std::pair<int, int> range);
 	static bool IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, std::pair<int, int>> range);
 	static bool IsNumber(const std::string& s);

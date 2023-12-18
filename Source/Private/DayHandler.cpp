@@ -32,6 +32,7 @@ DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day15);
 	dayFunctions.emplace_back(&DayHandler::Day16);
 	dayFunctions.emplace_back(&DayHandler::Day17);
+	dayFunctions.emplace_back(&DayHandler::Day18);
 	currentDay = dayFunctions.size();
 }
 
@@ -1816,6 +1817,145 @@ void DayHandler::Day17(FileHandler& fileHandler)
 	}
 
 	std::cout << "Part Two: " << minHeatLoss << std::endl;
+}
+
+void DayHandler::Day18(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day18.txt");
+	std::vector<std::vector<std::string>> digPlan = CustomLib::SplitString(tab, ' ');
+	std::vector<std::vector<char>> map = { {'#'} };
+	std::pair current = { 0,0 }, start = { 0,0 };
+	for (std::vector<std::string> instruction : digPlan)
+	{
+		if (instruction[0] == "R")
+		{
+			for (int i = 0; i < std::stoi(instruction[1]); i++)
+			{
+				current.first++;
+				if (current.first >= map[current.second].size())
+				{
+					for (int j = 0; j < map.size(); j++)
+						map[j].push_back('.');
+				}
+				map[current.second][current.first] = '#';
+			}
+		}
+		else if (instruction[0] == "D")
+		{
+			for (int i = 0; i < std::stoi(instruction[1]); i++)
+			{
+				current.second++;
+				if (current.second >= map.size())
+				{
+					map.push_back({});
+					for (int j = 0; j < map[0].size(); j++)
+						map[map.size() - 1].push_back('.');
+				}
+				map[current.second][current.first] = '#';
+			}
+		}
+		else if (instruction[0] == "L")
+		{
+			for (int i = 0; i < std::stoi(instruction[1]); i++)
+			{
+				current.first--;
+				if (current.first < 0)
+				{
+					for (int j = 0; j < map.size(); j++)
+						map[j].insert(map[j].begin(), '.');
+					current.first++;
+					start.first++;
+				}
+				map[current.second][current.first] = '#';
+			}
+		}
+		else if (instruction[0] == "U")
+		{
+			for (int i = 0; i < std::stoi(instruction[1]); i++)
+			{
+				current.second--;
+				if (current.second < 0)
+				{
+					std::vector<char> tmp;
+					for (int j = 0; j < map[0].size(); j++)
+						tmp.push_back('.');
+					map.insert(map.begin(), tmp);
+					current.second++;
+					start.second++;
+				}
+				map[current.second][current.first] = '#';
+			}
+		}
+	}
+	/*std::cout << "Generating map..." << std::endl;
+	if (fileHandler.WriteFile("Day18Map.txt", map))
+		std::cout << "Map generated properly to file Day18Map.txt" << std::endl;
+	else
+		std::cout << "Map generation failed" << std::endl;*/
+
+	std::vector<std::vector<char>> map1 = map;
+	{
+		std::vector<std::pair<int, int>> tmp = { {start.first + 1, start.second} };
+		int i = 0;
+		do
+		{
+			std::pair<int, int> tmp1 = tmp[i];
+			if (map1[tmp1.first - 1][tmp1.second] == '.')
+			{
+				map1[tmp1.first - 1][tmp1.second] = '#';
+				tmp.push_back({ tmp1.first - 1,tmp1.second });
+			}
+			if (map1[tmp1.first + 1][tmp1.second] == '.')
+			{
+				map1[tmp1.first + 1][tmp1.second] = '#';
+				tmp.push_back({ tmp1.first + 1,tmp1.second });
+			}
+			if (map1[tmp1.first][tmp1.second - 1] == '.')
+			{
+				map1[tmp1.first][tmp1.second - 1] = '#';
+				tmp.push_back({ tmp1.first,tmp1.second - 1 });
+			}
+			if (map1[tmp1.first][tmp1.second + 1] == '.')
+			{
+				map1[tmp1.first][tmp1.second + 1] = '#';
+				tmp.push_back({ tmp1.first,tmp1.second + 1 });
+			}
+			i++;
+		} while (i < tmp.size());
+	}
+
+	/*std::cout << "Generating map..." << std::endl;
+	if (fileHandler.WriteFile("Day18Map1.txt", map1))
+		std::cout << "Map generated properly to file Day18Map1.txt" << std::endl;
+	else
+		std::cout << "Map generation failed" << std::endl;*/
+
+	long long count = 0;
+	for (std::vector<char> line : map1)
+		for (char tmp : line)
+			if (tmp == '#')
+				count++;
+
+	std::cout << "Part One: " << count << std::endl;
+
+	/*std::vector<std::vector<std::string>> digPlan1;
+	for (std::vector<std::string> instruction : digPlan)
+	{
+		std::string direction = instruction[2].substr(instruction[2].length() - 2, 1);
+		std::string distance = instruction[2].substr(2, instruction[2].length() - 4);
+		distance = std::to_string(std::stoi(distance, nullptr, 16));
+		if (direction == "0")
+			direction = "R";
+		else if (direction == "1")
+			direction = "D";
+		else if (direction == "2")
+			direction = "L";
+		else if (direction == "3")
+			direction = "U";
+		digPlan1.push_back({ direction,distance });
+	}
+
+	std::cout << "Part Two: " << count << std::endl;*/
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const

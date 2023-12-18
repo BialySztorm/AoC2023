@@ -61,6 +61,38 @@ std::vector<std::string> CustomLib::SplitString(const std::string& input, const 
 	return tmp;
 }
 
+std::vector<std::vector<std::string>> CustomLib::SplitString(const std::vector<std::string>& input, const char delimiter)
+{
+	std::vector<std::vector<std::string>> tmp;
+	for (std::string str : input)
+		tmp.push_back(SplitString(str, delimiter));
+	return tmp;
+}
+
+std::vector<std::vector<std::string>> CustomLib::SplitString(const std::vector<std::string>& input, const char delimiter, std::vector<int> unnecesaryColumns)
+{
+	std::vector<std::vector<std::string>> tmp;
+	for (std::string str : input)
+		tmp.push_back(SplitString(str, delimiter, unnecesaryColumns));
+	return tmp;
+}
+
+std::vector<std::vector<std::string>> CustomLib::SplitString(const std::vector<std::string>& input, const std::vector<char> delimiters)
+{
+	std::vector<std::vector<std::string>> tmp;
+	for (std::string str : input)
+		tmp.push_back(SplitString(str, delimiters));
+	return tmp;
+}
+
+std::vector<std::vector<std::string>> CustomLib::SplitString(const std::vector<std::string>& input, const std::vector<char> delimiters, std::vector<int> unnecesaryColumns)
+{
+	std::vector<std::vector<std::string>> tmp;
+	for (std::string str : input)
+		tmp.push_back(SplitString(str, delimiters, unnecesaryColumns));
+	return tmp;
+}
+
 bool CustomLib::IsWithinRange(const int point, const std::pair<int, int> range)
 {
 	return (point >= range.first && point <= range.second || point <= range.first && point >= range.second);
