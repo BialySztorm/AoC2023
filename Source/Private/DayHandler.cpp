@@ -1895,9 +1895,21 @@ void DayHandler::Day18(FileHandler& fileHandler)
 
 	std::vector<std::vector<char>> map1 = map;
 	{
-		std::vector<std::pair<int, int>> tmp = { {start.first + 1, start.second} };
+		std::vector<std::pair<int, int>> tmp;
+		for (int i = 0; i < map1.size(); i++)
+		{
+			for (int j = 0; j < map1[i].size(); j++)
+				if (map1[i][j] == '#' && map1[i + 1][j + 1] == '.')
+				{
+					tmp.push_back({ i + 1,j + 1 });
+					break;
+				}
+			if (tmp.size())
+				break;
+		}
+
 		int i = 0;
-		do
+		while (i < tmp.size())
 		{
 			std::pair<int, int> tmp1 = tmp[i];
 			if (map1[tmp1.first - 1][tmp1.second] == '.')
@@ -1921,7 +1933,7 @@ void DayHandler::Day18(FileHandler& fileHandler)
 				tmp.push_back({ tmp1.first,tmp1.second + 1 });
 			}
 			i++;
-		} while (i < tmp.size());
+		}
 	}
 
 	/*std::cout << "Generating map..." << std::endl;
@@ -1938,7 +1950,7 @@ void DayHandler::Day18(FileHandler& fileHandler)
 
 	std::cout << "Part One: " << count << std::endl;
 
-	/*std::vector<std::vector<std::string>> digPlan1;
+	std::vector<std::vector<std::string>> digPlan1;
 	for (std::vector<std::string> instruction : digPlan)
 	{
 		std::string direction = instruction[2].substr(instruction[2].length() - 2, 1);
@@ -1955,7 +1967,22 @@ void DayHandler::Day18(FileHandler& fileHandler)
 		digPlan1.push_back({ direction,distance });
 	}
 
-	std::cout << "Part Two: " << count << std::endl;*/
+	std::vector<std::pair<long long, long long>> points;
+	points.push_back({ 0,0 });
+
+	for (std::vector<std::string> instruction : digPlan1)
+	{
+		if (instruction[0] == "U")
+			points.push_back({ points.back().first,points.back().second - std::stoi(instruction[1]) });
+		else if (instruction[0] == "D")
+			points.push_back({ points.back().first,points.back().second + std::stoi(instruction[1]) });
+		else if (instruction[0] == "L")
+			points.push_back({ points.back().first - std::stoi(instruction[1]),points.back().second });
+		else if (instruction[0] == "R")
+			points.push_back({ points.back().first + std::stoi(instruction[1]),points.back().second });
+	}
+	points.pop_back();
+	std::cout << "Part Two: " << std::to_string(static_cast<long long>(CustomLib::CalculatePolygonArea(points) + std::round(static_cast<long double>(CustomLib::CalculatePolygonPerimeter(points) + 1) / 2))) << std::endl;
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const

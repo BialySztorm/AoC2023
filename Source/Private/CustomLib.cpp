@@ -104,6 +104,41 @@ bool CustomLib::IsWithinRange(const std::pair<int, int> point, const std::pair<s
 		point.second >= range.first.second && point.second <= range.second.second);
 }
 
+long long CustomLib::CalculatePolygonArea(const std::vector<std::pair<long long, long long>>& points)
+{
+	long long n = points.size();
+	if (n < 3) {
+		return 0;
+	}
+
+	long long area = 0;
+	for (long long i = 0; i < n; ++i)
+	{
+		long long next = (i + 1) % n;
+		area += (points[i].first + points[next].first) * (points[i].second - points[next].second);
+	}
+
+	return std::abs(area) / 2.0;
+}
+
+long long CustomLib::CalculatePolygonPerimeter(const std::vector<std::pair<long long, long long>>& points)
+{
+	int n = points.size();
+	if (n < 3) {
+		return 0.0;
+	}
+
+	long long perimeter = 0;
+	for (long long i = 0; i < n; ++i) {
+		long long next = (i + 1) % n;
+		long long dx = points[next].first - points[i].first;
+		long long dy = points[next].second - points[i].second;
+		perimeter += std::abs(dx) + std::abs(dy);
+	}
+
+	return perimeter;
+}
+
 bool CustomLib::IsNumber(const std::string& s)
 {
 	return !s.empty() && std::all_of(s.begin(), s.end(), ::isdigit);

@@ -18,6 +18,8 @@ public:
 	static std::vector<std::vector<std::string>> SplitString(const std::vector<std::string>& input, const std::vector<char> delimiters, std::vector<int> unnecesaryColumns);
 	static bool IsWithinRange(const int point, const std::pair<int, int> range);
 	static bool IsWithinRange(const std::pair<int, int> point, const std::pair<std::pair<int, int>, std::pair<int, int>> range);
+	static long long CalculatePolygonArea(const std::vector<std::pair<long long, long long>>& points);
+	static long long CalculatePolygonPerimeter(const std::vector<std::pair<long long, long long>>& points);
 	static bool IsNumber(const std::string& s);
 	static int CountOccurences(const std::string& str, const char target);
 	static void PushError(const std::string e);
