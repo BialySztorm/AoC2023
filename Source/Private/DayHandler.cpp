@@ -33,6 +33,7 @@ DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day16);
 	dayFunctions.emplace_back(&DayHandler::Day17);
 	dayFunctions.emplace_back(&DayHandler::Day18);
+	dayFunctions.emplace_back(&DayHandler::Day19);
 	currentDay = dayFunctions.size();
 }
 
@@ -1985,6 +1986,58 @@ void DayHandler::Day18(FileHandler& fileHandler)
 	std::cout << "Part Two: " << std::to_string(static_cast<long long>(CustomLib::CalculatePolygonArea(points) + std::round(static_cast<long double>(CustomLib::CalculatePolygonPerimeter(points) + 1) / 2))) << std::endl;
 }
 
+void DayHandler::Day19(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day19.txt");
+	std::unordered_map < std::string, std::vector<Instruction>> workflows;
+	std::vector<std::unordered_map<std::string, int>> parts;
+	{
+		int i = 0;
+		while (tab[i] != "")
+		{
+			std::vector<std::string> tmp = CustomLib::SplitString(tab[i], { '{','}' });
+			std::string key = tmp[0];
+			std::vector<std::string> tmp1 = CustomLib::SplitString(tmp[1], ',');
+			std::vector<Instruction> tmp2;
+			for (std::string tmp3 : tmp1)
+			{
+				std::vector<std::string> tmp4 = CustomLib::SplitString(tmp3, { '<','>',':' });
+				if (tmp4.size() <= 1)
+					tmp2.push_back({ '=',{tmp4[0]} });
+				else
+				{
+					char type;
+					if (tmp3.find('<') != std::string::npos)
+						type = '<';
+					else if (tmp3.find('>') != std::string::npos)
+						type = '>';
+					tmp2.push_back({ type,tmp4 });
+				}
+			}
+			workflows.emplace(key, tmp2);
+			i++;
+		}
+		while (++i < tab.size())
+		{
+			std::vector<std::string> tmp = CustomLib::SplitString(tab[i], { '{','}','=',',' });
+			std::unordered_map<std::string, int> tmp1;
+			for (int i = 0; i < tmp.size(); i += 2)
+				tmp1.emplace(tmp[i], std::stoi(tmp[i + 1]));
+			parts.push_back(tmp1);
+		}
+	}
+	long long sum = 0;
+	for (std::unordered_map<std::string, int>& part : parts)
+	{
+		if (Day19HandleInstructions(workflows, part) == 'A')
+		{
+			for (auto& tmp : part)
+				sum += tmp.second;
+		}
+	}
+	std::cout << "Part One: " << sum << std::endl;
+}
+
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const
 {
 	std::vector<std::pair<long long, long long>> tmp, tab1 = tab;
@@ -2320,4 +2373,54 @@ void DayHandler::Day16DrawMap(std::vector<std::string>& map, const std::vector<s
 		else
 			std::cout << "ERROR" << std::endl;
 	}
+}
+
+char DayHandler::Day19HandleInstructions(const std::unordered_map<std::string, std::vector<Instruction>>& worklows, const std::unordered_map<std::string, int>& part)
+{
+	std::string currentWorklow = "in";
+	while (currentWorklow != "R" && currentWorklow != "A")
+	{
+		if (worklows.find(currentWorklow) == worklows.end())
+		{
+			std::cout << "ERROR: Workflow not found" << std::endl;
+			break;
+		}
+		for (Instruction instruction : worklows.at(currentWorklow))
+		{
+			if (instruction.type == '=')
+			{
+				currentWorklow = instruction.arguments[0];
+				break;
+			}
+			else if (instruction.type == '<')
+			{
+				if (part.find(instruction.arguments[0]) == part.end())
+				{
+					std::cout << "ERROR: Part not found" << std::endl;
+					break;
+				}
+				if (part.at(instruction.arguments[0]) < std::stoi(instruction.arguments[1]))
+				{
+					currentWorklow = instruction.arguments[2];
+					break;
+				}
+			}
+			else if (instruction.type == '>')
+			{
+				if (part.find(instruction.arguments[0]) == part.end())
+				{
+					std::cout << "ERROR: Part not found" << std::endl;
+					break;
+				}
+				if (part.at(instruction.arguments[0]) > std::stoi(instruction.arguments[1]))
+				{
+					currentWorklow = instruction.arguments[2];
+					break;
+				}
+			}
+			else
+				std::cout << "ERROR" << std::endl;
+		}
+	}
+	return currentWorklow[0];
 }

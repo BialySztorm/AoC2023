@@ -23,6 +23,11 @@ private:
 			return h1 ^ h2 ^ h3;
 		}
 	};
+
+	struct Instruction {
+		char type;
+		std::vector<std::string> arguments;
+	};
 	// private variables
 	int currentDay;
 	std::vector<void (DayHandler::*)(FileHandler&)> dayFunctions;
@@ -50,6 +55,7 @@ private:
 	void Day16(FileHandler& fileHandler);
 	void Day17(FileHandler& fileHandler);
 	void Day18(FileHandler& fileHandler);
+	void Day19(FileHandler& fileHandler);
 
 	// Additional day functions
 	std::vector<std::pair<long long, long long>> Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const;
@@ -57,4 +63,5 @@ private:
 	bool Day10HandlePipe(std::pair<int, int>* previousLocation, std::pair<int, int>* currentLocation, const std::vector<std::string> map) const;
 	long long Day12CountOccurencies(const std::string& conditionReport, const std::vector<int>& damagedGroups, long long i = 0, long long gi = 0, long long current = 0);
 	void Day16DrawMap(std::vector<std::string>& map, const std::vector<std::string> tab, int x = 0, int y = 0, int dx = 1, int dy = 0);
+	char Day19HandleInstructions(const std::unordered_map<std::string, std::vector<Instruction>>& worklows, const std::unordered_map<std::string, int>& part);
 };
