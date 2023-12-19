@@ -64,4 +64,5 @@ private:
 	long long Day12CountOccurencies(const std::string& conditionReport, const std::vector<int>& damagedGroups, long long i = 0, long long gi = 0, long long current = 0);
 	void Day16DrawMap(std::vector<std::string>& map, const std::vector<std::string> tab, int x = 0, int y = 0, int dx = 1, int dy = 0);
 	char Day19HandleInstructions(const std::unordered_map<std::string, std::vector<Instruction>>& worklows, const std::unordered_map<std::string, int>& part);
+	std::vector<std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, int>> >Day19GetAllRanges(const std::unordered_map<std::string, std::vector<Instruction>>& workflows, std::vector<Instruction> currentInstruction, std::unordered_map<std::string, int> min, std::unordered_map<std::string, int> max);
 };

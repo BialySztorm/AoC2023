@@ -2036,6 +2036,21 @@ void DayHandler::Day19(FileHandler& fileHandler)
 		}
 	}
 	std::cout << "Part One: " << sum << std::endl;
+
+	std::vector<std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, int>> > ranges = Day19GetAllRanges(workflows, workflows.at("in"), { {"x" , 1},{"m",1},{"a",1},{"s",1} }, { {"x" , 4000},{"m",4000},{"a",4000},{"s",4000} });
+	long long count = 0;
+	std::map<int, std::string> map = { {0,"x"} ,{1,"m"},{2,"a"},{3,"s"} };
+	for (auto& tmp : ranges)
+	{
+		long long tmpCount = 1;
+		for (int i = 0; i < 4; i++)
+		{
+			tmpCount *= tmp.second.at(map[i]) - tmp.first.at(map[i]) + 1;
+		}
+		count += tmpCount;
+	}
+
+	std::cout << "Part Two: " << count << std::endl;
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const
@@ -2423,4 +2438,60 @@ char DayHandler::Day19HandleInstructions(const std::unordered_map<std::string, s
 		}
 	}
 	return currentWorklow[0];
+}
+
+std::vector<std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, int>> > DayHandler::Day19GetAllRanges(const std::unordered_map<std::string, std::vector<Instruction>>& workflows, std::vector<Instruction> currentInstruction, std::unordered_map<std::string, int> min, std::unordered_map<std::string, int> max)
+{
+	std::vector<std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, int>> > tmp = {};
+	for (Instruction instruction : currentInstruction)
+	{
+		if (instruction.type == '<')
+		{
+			if (min.at(instruction.arguments[0]) < std::stoi(instruction.arguments[1]))
+			{
+				std::unordered_map<std::string, int> max1 = max;
+				if (std::stoi(instruction.arguments[1]) < max[instruction.arguments[0]])
+					max1[instruction.arguments[0]] = std::stoi(instruction.arguments[1]) - 1;
+				if (instruction.arguments[2] == "A")
+					tmp.push_back({ min,max1 });
+				else if (instruction.arguments[2] != "R")
+				{
+					std::vector<std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, int>> > tmp1 = Day19GetAllRanges(workflows, workflows.at(instruction.arguments[2]), min, max1);
+					tmp.insert(tmp.end(), tmp1.begin(), tmp1.end());
+				}
+				min[instruction.arguments[0]] = max1[instruction.arguments[0]] + 1;
+			}
+		}
+		else if (instruction.type == '>')
+		{
+			if (max.at(instruction.arguments[0]) > std::stoi(instruction.arguments[1]))
+			{
+				std::unordered_map<std::string, int> min1 = min;
+				if (std::stoi(instruction.arguments[1]) > min[instruction.arguments[0]])
+					min1[instruction.arguments[0]] = std::stoi(instruction.arguments[1]) + 1;
+				if (instruction.arguments[2] == "A")
+					tmp.push_back({ min1,max });
+				else if (instruction.arguments[2] != "R")
+				{
+					std::vector<std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, int>> > tmp1 = Day19GetAllRanges(workflows, workflows.at(instruction.arguments[2]), min1, max);
+					tmp.insert(tmp.end(), tmp1.begin(), tmp1.end());
+				}
+				max[instruction.arguments[0]] = min1[instruction.arguments[0]] - 1;
+			}
+		}
+		else if (instruction.type == '=')
+		{
+			if (instruction.arguments[0] == "A")
+				tmp.push_back({ min,max });
+			else if (instruction.arguments[0] != "R")
+			{
+				std::vector<std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, int>> > tmp1 = Day19GetAllRanges(workflows, workflows.at(instruction.arguments[0]), min, max);
+				tmp.insert(tmp.end(), tmp1.begin(), tmp1.end());
+			}
+		}
+		else
+			std::cout << "ERROR" << std::endl;
+	}
+
+	return tmp;
 }
