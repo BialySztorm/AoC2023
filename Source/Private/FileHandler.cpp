@@ -92,7 +92,8 @@ nlohmann::json FileHandler::ReadJsonFileStruct(const std::string fileName) const
 {
 	std::ifstream file(inputDir + fileName);
 	if (!file.is_open()) {
-		throw std::runtime_error("Unable to open file: " + inputDir + fileName);
+		CustomLib::PushError("Error while opening file: " + inputDir + fileName);
+		return nlohmann::json();
 	}
 
 	nlohmann::json jsonData;

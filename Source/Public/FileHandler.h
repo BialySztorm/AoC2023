@@ -26,6 +26,8 @@ template<typename T>
 inline T FileHandler::ReadJsonFile(const std::string& fileName) const
 {
 	nlohmann::json jsonData = ReadJsonFileStruct(fileName);
+	if (jsonData == nlohmann::json())
+		return T();
 	return jsonData.get<T>();
 }
 
