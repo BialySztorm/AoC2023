@@ -56,6 +56,7 @@ private:
 	void Day17(FileHandler& fileHandler);
 	void Day18(FileHandler& fileHandler);
 	void Day19(FileHandler& fileHandler);
+	void Day20(FileHandler& fileHandler);
 
 	// Additional day functions
 	std::vector<std::pair<long long, long long>> Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const;
@@ -65,4 +66,5 @@ private:
 	void Day16DrawMap(std::vector<std::string>& map, const std::vector<std::string> tab, int x = 0, int y = 0, int dx = 1, int dy = 0);
 	char Day19HandleInstructions(const std::unordered_map<std::string, std::vector<Instruction>>& worklows, const std::unordered_map<std::string, int>& part);
 	std::vector<std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, int>> >Day19GetAllRanges(const std::unordered_map<std::string, std::vector<Instruction>>& workflows, std::vector<Instruction> currentInstruction, std::unordered_map<std::string, int> min, std::unordered_map<std::string, int> max);
+	std::pair<long long, long long> Day20CountPulses(const std::unordered_map<std::string, std::pair<std::vector<std::string>, char>>& moduleConfiguration, std::unordered_map<std::string, bool> flipFlopPulses, std::unordered_map<std::string, std::unordered_map<std::string, bool>> conjuctionPulses, const long long& buttonRepeats = 1000, const bool& part2 = false);
 };

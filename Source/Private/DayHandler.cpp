@@ -34,6 +34,7 @@ DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day17);
 	dayFunctions.emplace_back(&DayHandler::Day18);
 	dayFunctions.emplace_back(&DayHandler::Day19);
+	dayFunctions.emplace_back(&DayHandler::Day20);
 	currentDay = dayFunctions.size();
 }
 
@@ -2053,6 +2054,50 @@ void DayHandler::Day19(FileHandler& fileHandler)
 	std::cout << "Part Two: " << count << std::endl;
 }
 
+void DayHandler::Day20(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day20.txt");
+	std::unordered_map<std::string, std::pair<std::vector<std::string>, char>> moduleConfiguration;
+	std::unordered_map<std::string, bool> flipFlopPulses;
+	std::unordered_map<std::string, std::unordered_map<std::string, bool>> conjuctionPulses;
+	for (std::string line : tab)
+	{
+		std::string key;
+		std::pair<std::vector<std::string>, char> values;
+		std::vector<std::string> tmp = CustomLib::SplitString(line, { '-','>' });
+		key = tmp[0].substr(0, tmp[0].length() - 1);
+		if (key[0] == '%')
+			flipFlopPulses.emplace(key.substr(1), false);
+		if (key[0] != 'b')
+		{
+			values.second = key[0];
+			key = key.substr(1);
+		}
+		else
+			values.second = '#';
+		values.first = CustomLib::SplitString(tmp[1], { ',',' ' });
+		moduleConfiguration.emplace(key, values);
+	}
+	for (auto& tmp : moduleConfiguration)
+	{
+		if (tmp.second.second == '&')
+		{
+			std::unordered_map<std::string, bool> tmp1;
+			for (auto& tmp2 : moduleConfiguration)
+			{
+				auto tmp3 = std::find(tmp2.second.first.begin(), tmp2.second.first.end(), tmp.first);
+				if (tmp3 != tmp2.second.first.end())
+					tmp1.emplace(tmp2.first, false);
+			}
+			conjuctionPulses.emplace(tmp.first, tmp1);
+		}
+	}
+	std::pair<long long, long long> pulseCount = Day20CountPulses(moduleConfiguration, flipFlopPulses, conjuctionPulses);
+	std::cout << "Part One: " << pulseCount.first * pulseCount.second << std::endl;
+	pulseCount = Day20CountPulses(moduleConfiguration, flipFlopPulses, conjuctionPulses, std::numeric_limits<long long>::max(), true);
+	std::cout << "Part Two: " << pulseCount.first << std::endl;
+}
+
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const
 {
 	std::vector<std::pair<long long, long long>> tmp, tab1 = tab;
@@ -2494,4 +2539,86 @@ std::vector<std::pair<std::unordered_map<std::string, int>, std::unordered_map<s
 	}
 
 	return tmp;
+}
+
+std::pair<long long, long long> DayHandler::Day20CountPulses(const std::unordered_map<std::string, std::pair<std::vector<std::string>, char>>& moduleConfiguration, std::unordered_map<std::string, bool> flipFlopPulses, std::unordered_map<std::string, std::unordered_map<std::string, bool>> conjuctionPulses, const long long& buttonRepeats, const bool& part2)
+{
+	std::pair<long long, long long> pulsesCount = { 0,0 };
+	for (int i = 0; i < buttonRepeats; i++)
+	{
+		std::cout << i << "/" << buttonRepeats << "\r";
+		std::cout.flush();
+		std::vector<std::pair<std::vector<std::string>, char>> currentModules = std::vector< std::pair<std::vector<std::string>, char>>({ moduleConfiguration.at("broadcaster") });
+		std::vector<std::pair<std::string, std::string>> currentModulesNames = { {"button","broadcaster"} };
+		std::vector<bool> pulses = { false };
+		pulsesCount.first++;
+		while (currentModules.size())
+		{
+			if (currentModules[0].second == '#')
+			{
+				for (auto& module : currentModules[0].first)
+				{
+					pulsesCount.first++;
+					currentModules.push_back(moduleConfiguration.at(module));
+					pulses.push_back(false);
+					currentModulesNames.push_back({ currentModulesNames[0].second,module });
+				}
+			}
+			else if (currentModules[0].second == '%')
+			{
+				if (!pulses[0])
+				{
+					flipFlopPulses[currentModulesNames[0].second] = !flipFlopPulses[currentModulesNames[0].second];
+					for (auto& module : currentModules[0].first)
+					{
+						if (flipFlopPulses[currentModulesNames[0].second])
+							pulsesCount.second++;
+						else
+							pulsesCount.first++;
+						currentModules.push_back(moduleConfiguration.at(module));
+						pulses.push_back(flipFlopPulses[currentModulesNames[0].second]);
+						currentModulesNames.push_back({ currentModulesNames[0].second,module });
+					}
+				}
+			}
+			else if (currentModules[0].second == '&')
+			{
+				bool isHeightPulse = true;
+				conjuctionPulses[currentModulesNames[0].second][currentModulesNames[0].first] = pulses[0];
+				for (auto& pulse : conjuctionPulses.at(currentModulesNames[0].second))
+					if (!pulse.second)
+					{
+						isHeightPulse = false;
+						break;
+					}
+				for (auto& module : currentModules[0].first)
+				{
+					if (isHeightPulse)
+						pulsesCount.first++;
+					else
+						pulsesCount.second++;
+					if (moduleConfiguration.find(module) != moduleConfiguration.end())
+					{
+						pulses.push_back(!isHeightPulse);
+						currentModules.push_back(moduleConfiguration.at(module));
+						currentModulesNames.push_back({ currentModulesNames[0].second,module });
+					}
+					else
+					{
+						if (part2 && isHeightPulse)
+						{
+							return { i + 1,0 };
+						}
+					}
+				}
+			}
+			else
+				std::cout << "ERROR" << std::endl;
+			currentModulesNames.erase(currentModulesNames.begin());
+			currentModules.erase(currentModules.begin());
+			pulses.erase(pulses.begin());
+		}
+		//std::cout << pulsesCount.first << "," << pulsesCount.second << std::endl;
+	}
+	return pulsesCount;
 }
