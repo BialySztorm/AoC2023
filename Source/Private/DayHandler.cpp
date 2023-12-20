@@ -1826,7 +1826,7 @@ void DayHandler::Day18(FileHandler& fileHandler)
 	std::vector<std::string> tab = fileHandler.ReadFile("day18.txt");
 	std::vector<std::vector<std::string>> digPlan = CustomLib::SplitString(tab, ' ');
 	std::vector<std::vector<char>> map = { {'#'} };
-	std::pair current = { 0,0 }, start = { 0,0 };
+	std::pair<int, int> current = { 0,0 }, start = { 0,0 };
 	for (std::vector<std::string> instruction : digPlan)
 	{
 		if (instruction[0] == "R")
@@ -2094,7 +2094,7 @@ void DayHandler::Day20(FileHandler& fileHandler)
 	}
 	std::pair<long long, long long> pulseCount = Day20CountPulses(moduleConfiguration, flipFlopPulses, conjuctionPulses);
 	std::cout << "Part One: " << pulseCount.first * pulseCount.second << std::endl;
-	pulseCount = Day20CountPulses(moduleConfiguration, flipFlopPulses, conjuctionPulses, std::numeric_limits<long long>::max(), true);
+	pulseCount = Day20CountPulses(moduleConfiguration, flipFlopPulses, conjuctionPulses, std::pow<long long>(10,16), true);
 	std::cout << "Part Two: " << pulseCount.first << std::endl;
 }
 
@@ -2544,7 +2544,36 @@ std::vector<std::pair<std::unordered_map<std::string, int>, std::unordered_map<s
 std::pair<long long, long long> DayHandler::Day20CountPulses(const std::unordered_map<std::string, std::pair<std::vector<std::string>, char>>& moduleConfiguration, std::unordered_map<std::string, bool> flipFlopPulses, std::unordered_map<std::string, std::unordered_map<std::string, bool>> conjuctionPulses, const long long& buttonRepeats, const bool& part2)
 {
 	std::pair<long long, long long> pulsesCount = { 0,0 };
-	for (int i = 0; i < buttonRepeats; i++)
+	std::unordered_map < std::string, long long> countOccurencies;
+	std::unordered_map < std::string, long long> previousOccurencies;
+	std::vector<long long> LCMTab;
+	std::vector<std::string> modulesToWatch;
+	if (part2)
+	{
+		std::string lastModule = "rx";
+		for (auto& tmp : moduleConfiguration)
+		{
+			for (auto& tmp1 : tmp.second.first)
+				if (tmp1 == "rx")
+				{
+					lastModule = tmp.first;
+					break;
+				}
+			if (lastModule != "rx")
+				break;
+		}
+		for (auto& tmp : moduleConfiguration)
+		{
+			for (auto& tmp1 : tmp.second.first)
+				if (tmp1 == lastModule)
+				{
+					modulesToWatch.push_back(tmp.first);
+					//std::cout << tmp.first << std::endl;
+					break;
+				}
+		}
+	}
+	for (int i = 1; i <= buttonRepeats; i++)
 	{
 		std::cout << i << "/" << buttonRepeats << "\r";
 		std::cout.flush();
@@ -2554,6 +2583,22 @@ std::pair<long long, long long> DayHandler::Day20CountPulses(const std::unordere
 		pulsesCount.first++;
 		while (currentModules.size())
 		{
+			if (part2)
+			{
+				if (!pulses[0])
+				{
+					auto it = previousOccurencies.find(currentModulesNames[0].second);
+					auto it1 = std::find(modulesToWatch.begin(), modulesToWatch.end(), currentModulesNames[0].second);
+					if (it != previousOccurencies.end() && countOccurencies[currentModulesNames[0].second] == 2 && it1 != modulesToWatch.end())
+					{
+						LCMTab.push_back(i - it->second);
+					}
+					previousOccurencies[currentModulesNames[0].second] = i;
+					countOccurencies[currentModulesNames[0].second]++;
+				}
+				if (LCMTab.size() == modulesToWatch.size())
+					return { CustomLib::LCM(LCMTab),0 };
+			}
 			if (currentModules[0].second == '#')
 			{
 				for (auto& module : currentModules[0].first)
@@ -2605,9 +2650,9 @@ std::pair<long long, long long> DayHandler::Day20CountPulses(const std::unordere
 					}
 					else
 					{
-						if (part2 && isHeightPulse)
+						if (isHeightPulse)
 						{
-							return { i + 1,0 };
+							return { i,0 };
 						}
 					}
 				}

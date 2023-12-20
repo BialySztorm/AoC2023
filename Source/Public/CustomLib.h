@@ -4,6 +4,7 @@
 #include <sstream>
 #include <map>
 #include <bitset>
+#include <numeric>
 
 class CustomLib
 {
@@ -30,6 +31,8 @@ public:
 	static std::string DecToBin(const T decimalNumber);
 	template <typename T>
 	static T BinToDec(const std::string& binaryString);
+	template <typename T>
+	static T LCM(const std::vector<T>& values);
 private:
 	template <typename T, typename U, typename CompareFunction>
 	static U Partition(std::vector<T>& arr, const U low, const U high, const bool type, const CompareFunction compare);
@@ -88,6 +91,17 @@ inline T CustomLib::BinToDec(const std::string& binaryString)
 {
 	std::bitset<sizeof(T) * 8> binaryRepresentation(binaryString);
 	return static_cast<T>(binaryRepresentation.to_ulong());
+}
+
+template<typename T>
+inline T CustomLib::LCM(const std::vector<T>& values)
+{
+	T tmp = 1;
+	for (T value : values)
+	{
+		tmp = (tmp * value) / std::gcd(tmp, value);
+	}
+	return tmp;
 }
 
 template<typename T, typename U, typename CompareFunction>
