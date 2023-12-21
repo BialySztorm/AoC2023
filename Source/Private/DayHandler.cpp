@@ -35,6 +35,7 @@ DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day18);
 	dayFunctions.emplace_back(&DayHandler::Day19);
 	dayFunctions.emplace_back(&DayHandler::Day20);
+	dayFunctions.emplace_back(&DayHandler::Day21);
 	currentDay = dayFunctions.size();
 }
 
@@ -2096,6 +2097,97 @@ void DayHandler::Day20(FileHandler& fileHandler)
 	std::cout << "Part One: " << pulseCount.first * pulseCount.second << std::endl;
 	pulseCount = Day20CountPulses(moduleConfiguration, flipFlopPulses, conjuctionPulses, std::pow<long long>(10,16), true);
 	std::cout << "Part Two: " << pulseCount.first << std::endl;
+}
+
+void DayHandler::Day21(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day21.txt");
+	std::vector<std::pair<int,int>> steps;
+	for(int i = 0; i< tab.size(); i++)
+		for(int j = 0; j< tab[i].length(); j++)
+			if(tab[i][j] == 'S')
+			{
+				steps.push_back({j,i});
+				break;
+			}
+	for (int i = 0; i < 64; i++)
+	{
+		std::cout<<i<<"/64\r";
+		std::vector<std::pair<int, int>> tmp;
+		for (auto& step : steps)
+		{
+			std::pair<int, int> tmp1 = step;
+			if (step.first > 0 && tab[step.second][step.first - 1] == '.' || tab[step.second][step.first-1] == 'S')
+			{
+				tmp1 = {step.first - 1,step.second };
+				if(std::find(tmp.begin(),tmp.end(),tmp1) == tmp.end())
+					tmp.push_back(tmp1);
+			}
+			if (step.second > 0 && tab[step.second - 1][step.first] == '.' || tab[step.second - 1][step.first] == 'S')
+			{
+				tmp1 = { step.first,step.second - 1 };
+				if (std::find(tmp.begin(), tmp.end(), tmp1) == tmp.end())
+					tmp.push_back(tmp1);
+			}
+			if (step.first < tab[step.second].length() - 1 && tab[step.second][step.first + 1] == '.' || tab[step.second][step.first + 1] == 'S')
+			{
+				tmp1 = { step.first + 1,step.second };
+				if (std::find(tmp.begin(), tmp.end(), tmp1) == tmp.end())
+					tmp.push_back(tmp1);
+			}
+			if (step.second < tab.size() - 1 && tab[step.second + 1][step.first] == '.' || tab[step.second + 1][step.first] == 'S')
+			{
+				tmp1 = { step.first,step.second + 1 };
+				if (std::find(tmp.begin(), tmp.end(), tmp1) == tmp.end())
+					tmp.push_back(tmp1);
+			}
+		}
+		steps = tmp;
+	}
+	std::cout<<"Part One: "<<steps.size()<<std::endl;
+
+	std::vector<std::vector<std::pair<long long, long long>>> steps1;
+	for (int i = 0; i < tab.size(); i++)
+		for (int j = 0; j < tab[i].length(); j++)
+			if (tab[i][j] == 'S')
+			{
+				steps1.push_back({ {j,i} });
+				break;
+			}
+	for (int i = 0; i < 26501365; i++)
+	{
+		std::cout<<i<<"/26501365\r";
+		std::vector<std::pair<long long, long long>> tmp;
+		for (auto& step : steps)
+		{
+			std::pair<long long, long long> tmp1 = step;
+			if (tab[(step.second)%tab.size()][(step.first - 1) % tab[0].length()] == '.' || tab[(step.second) % tab.size()][(step.first - 1) % tab[0].length()] == 'S')
+			{
+				tmp1 = { step.first - 1,step.second };
+				if (std::find(tmp.begin(), tmp.end(), tmp1) == tmp.end())
+					tmp.push_back(tmp1);
+			}
+			if (tab[(step.second - 1) % tab.size()][(step.first) % tab[0].length()] == '.' || tab[(step.second - 1)%tab.size()][(step.first)%tab[0].length()] == 'S')
+			{
+				tmp1 = { step.first,step.second - 1 };
+				if (std::find(tmp.begin(), tmp.end(), tmp1) == tmp.end())
+					tmp.push_back(tmp1);
+			}
+			if ( tab[(step.second) % tab.size()][(step.first+1) % tab[0].length()] == '.' || tab[(step.second) % tab.size()][(step.first + 1) % tab[0].length()] == 'S')
+			{
+				tmp1 = { step.first + 1,step.second };
+				if (std::find(tmp.begin(), tmp.end(), tmp1) == tmp.end())
+					tmp.push_back(tmp1);
+			}
+			if ( tab[(step.second+1) % tab.size()][(step.first) % tab[0].length()] == '.' || tab[(step.second+1) % tab.size()][(step.first) % tab[0].length()] == 'S')
+			{
+				tmp1 = { step.first,step.second + 1 };
+				if (std::find(tmp.begin(), tmp.end(), tmp1) == tmp.end())
+					tmp.push_back(tmp1);
+			}
+		}
+		steps1.push_back(tmp);
+	}
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const
