@@ -8,6 +8,7 @@
 #include <limits>
 #include <unordered_map>
 #include <queue>
+#include <algorithm>
 #include "CustomLib.h"
 #include "FileHandler.h"
 
@@ -2095,32 +2096,32 @@ void DayHandler::Day20(FileHandler& fileHandler)
 	}
 	std::pair<long long, long long> pulseCount = Day20CountPulses(moduleConfiguration, flipFlopPulses, conjuctionPulses);
 	std::cout << "Part One: " << pulseCount.first * pulseCount.second << std::endl;
-	pulseCount = Day20CountPulses(moduleConfiguration, flipFlopPulses, conjuctionPulses, std::pow<long long>(10,16), true);
+	pulseCount = Day20CountPulses(moduleConfiguration, flipFlopPulses, conjuctionPulses, std::pow<long long>(10, 16), true);
 	std::cout << "Part Two: " << pulseCount.first << std::endl;
 }
 
 void DayHandler::Day21(FileHandler& fileHandler)
 {
 	std::vector<std::string> tab = fileHandler.ReadFile("day21.txt");
-	std::vector<std::pair<int,int>> steps;
-	for(int i = 0; i< tab.size(); i++)
-		for(int j = 0; j< tab[i].length(); j++)
-			if(tab[i][j] == 'S')
+	std::vector<std::pair<int, int>> steps;
+	for (int i = 0; i < tab.size(); i++)
+		for (int j = 0; j < tab[i].length(); j++)
+			if (tab[i][j] == 'S')
 			{
-				steps.push_back({j,i});
+				steps.push_back({ j,i });
 				break;
 			}
 	for (int i = 0; i < 64; i++)
 	{
-		std::cout<<i<<"/64\r";
+		std::cout << i << "/64\r";
 		std::vector<std::pair<int, int>> tmp;
 		for (auto& step : steps)
 		{
 			std::pair<int, int> tmp1 = step;
-			if (step.first > 0 && tab[step.second][step.first - 1] == '.' || tab[step.second][step.first-1] == 'S')
+			if (step.first > 0 && tab[step.second][step.first - 1] == '.' || tab[step.second][step.first - 1] == 'S')
 			{
-				tmp1 = {step.first - 1,step.second };
-				if(std::find(tmp.begin(),tmp.end(),tmp1) == tmp.end())
+				tmp1 = { step.first - 1,step.second };
+				if (std::find(tmp.begin(), tmp.end(), tmp1) == tmp.end())
 					tmp.push_back(tmp1);
 			}
 			if (step.second > 0 && tab[step.second - 1][step.first] == '.' || tab[step.second - 1][step.first] == 'S')
@@ -2144,50 +2145,120 @@ void DayHandler::Day21(FileHandler& fileHandler)
 		}
 		steps = tmp;
 	}
-	std::cout<<"Part One: "<<steps.size()<<std::endl;
+	std::cout << "Part One: " << steps.size() << std::endl;
 
-	std::vector<std::vector<std::pair<long long, long long>>> steps1;
+	std::pair<int, int> start;
 	for (int i = 0; i < tab.size(); i++)
 		for (int j = 0; j < tab[i].length(); j++)
 			if (tab[i][j] == 'S')
 			{
-				steps1.push_back({ {j,i} });
+				start = { j,i };
 				break;
 			}
-	for (int i = 0; i < 26501365; i++)
+
+	int ySize = tab.size();
+	int xSize = tab[0].length();
+
+	std::unordered_map<std::string, long long> distanceMap;
+	std::deque<std::tuple<long long, long long, long long, long long, long long>> queue = { {0,0,start.second,start.first,0} };
+	while (queue.size())
 	{
-		std::cout<<i<<"/26501365\r";
-		std::vector<std::pair<long long, long long>> tmp;
-		for (auto& step : steps)
+		auto [tempY, tempX, y, x, dist] = queue.front();
+		queue.pop_front();
+		if (y < 0)
 		{
-			std::pair<long long, long long> tmp1 = step;
-			if (tab[(step.second)%tab.size()][(step.first - 1) % tab[0].length()] == '.' || tab[(step.second) % tab.size()][(step.first - 1) % tab[0].length()] == 'S')
+			tempY -= 1;
+			y += ySize;
+		}
+		if (y >= ySize)
+		{
+			tempY += 1;
+			y -= ySize;
+		}
+		if (x < 0)
+		{
+			tempX -= 1;
+			x += xSize;
+		}
+		if (x >= xSize)
+		{
+			tempX += 1;
+			x -= xSize;
+		}
+		if (!(0 <= y && y < ySize && 0 <= x && x < xSize && tab[y][x] != '#'))
+			continue;
+		std::string key = std::to_string(tempY) + "," + std::to_string(tempX) + "," + std::to_string(y) + "," + std::to_string(x);
+		if (distanceMap.find(key) != distanceMap.end())
+			continue;
+		if (std::abs(tempY) > 4 || std::abs(tempX) > 4)
+			continue;
+		distanceMap[key] = dist;
+		for (auto [dy, dx] : std::vector<std::pair<int, int>>{ {-1, 0}, {0, 1}, {1, 0}, {0, -1} })
+			queue.push_back({ tempY,tempX ,y + dy,x + dx,dist + 1 });
+	}
+
+	long long limit = 26501365;
+	long long ans = 0;
+	std::map<std::string, long long> solveMap;
+	for (int y = 0; y < ySize; y++)
+	{
+		for (int x = 0; x < xSize; x++)
+		{
+			std::cout << y << "/" << ySize << ", " << x << "/" << xSize << "\r";
+			std::cout.flush();
+			std::string key = "0,0," + std::to_string(y) + "," + std::to_string(x);
+			if (distanceMap.find(key) != distanceMap.end())
 			{
-				tmp1 = { step.first - 1,step.second };
-				if (std::find(tmp.begin(), tmp.end(), tmp1) == tmp.end())
-					tmp.push_back(tmp1);
-			}
-			if (tab[(step.second - 1) % tab.size()][(step.first) % tab[0].length()] == '.' || tab[(step.second - 1)%tab.size()][(step.first)%tab[0].length()] == 'S')
-			{
-				tmp1 = { step.first,step.second - 1 };
-				if (std::find(tmp.begin(), tmp.end(), tmp1) == tmp.end())
-					tmp.push_back(tmp1);
-			}
-			if ( tab[(step.second) % tab.size()][(step.first+1) % tab[0].length()] == '.' || tab[(step.second) % tab.size()][(step.first + 1) % tab[0].length()] == 'S')
-			{
-				tmp1 = { step.first + 1,step.second };
-				if (std::find(tmp.begin(), tmp.end(), tmp1) == tmp.end())
-					tmp.push_back(tmp1);
-			}
-			if ( tab[(step.second+1) % tab.size()][(step.first) % tab[0].length()] == '.' || tab[(step.second+1) % tab.size()][(step.first) % tab[0].length()] == 'S')
-			{
-				tmp1 = { step.first,step.second + 1 };
-				if (std::find(tmp.begin(), tmp.end(), tmp1) == tmp.end())
-					tmp.push_back(tmp1);
+				std::vector<int> options = { -3,-2,-1,0,1,2,3 };
+				for (auto& tempY : options)
+				{
+					for (auto& tempX : options)
+					{
+						std::string key = std::to_string(tempY) + "," + std::to_string(tempX) + "," + std::to_string(y) + "," + std::to_string(x);
+						long long dist = distanceMap[key];
+						if (dist % 2 == limit % 2 && dist <= limit)
+							ans++;
+						if ((tempY == *std::min_element(options.begin(), options.end()) || tempY == *std::max_element(options.begin(), options.end())) && (tempX == *std::min_element(options.begin(), options.end()) || tempX == *std::max_element(options.begin(), options.end())))
+						{
+							long long amount = (limit - dist) / ySize;
+							std::string key = std::to_string(dist) + ",2," + std::to_string(limit);
+							if (solveMap.find(key) != solveMap.end())
+							{
+								ans += solveMap[key];
+								continue;
+							}
+							long long ret = 0;
+							for (int i = 1; i <= amount; i++)
+							{
+								if (dist + ySize * i <= limit && (dist + ySize * i) % 2 == limit % 2)
+									ret += i + 1;
+							}
+							ans += ret;
+						}
+						else if ((tempY == *std::min_element(options.begin(), options.end()) || tempY == *std::max_element(options.begin(), options.end())) || (tempX == *std::min_element(options.begin(), options.end()) || tempX == *std::max_element(options.begin(), options.end())))
+						{
+							long long amount = (limit - dist) / ySize;
+							std::string key = std::to_string(dist) + ",1," + std::to_string(limit);
+							if (solveMap.find(key) != solveMap.end())
+							{
+								ans += solveMap[key];
+								continue;
+							}
+							long long ret = 0;
+							for (int i = 1; i <= amount; i++)
+							{
+								if (dist + ySize * i <= limit && (dist + ySize * i) % 2 == limit % 2)
+									ret++;
+							}
+							ans += ret;
+						}
+					}
+				}
 			}
 		}
-		steps1.push_back(tmp);
 	}
+
+	std::cout << "Part Two: " << ans << std::endl;
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const
