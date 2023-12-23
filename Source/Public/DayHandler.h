@@ -52,7 +52,7 @@ private:
 			std::vector<std::tuple<int, int, int>> coordinates;
 			for (int i = x.first; i <= x.second; i++)
 				for (int j = y.first; j <= y.second; j++)
-					coordinates.push_back(std::make_tuple(i, j, z.second+1));
+					coordinates.push_back(std::make_tuple(i, j, z.second + 1));
 			return coordinates;
 		}
 		std::vector<std::tuple<int, int, int>> getCoordinates() const
@@ -66,13 +66,12 @@ private:
 		}
 		bool moveDown()
 		{
-			if(z.first <= 1)
+			if (z.first <= 1)
 				return false;
 			z.first--;
 			z.second--;
 			return true;
 		}
-
 	};
 
 	std::vector<Brick> bricks;
