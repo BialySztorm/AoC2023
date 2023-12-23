@@ -38,6 +38,7 @@ DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day20);
 	dayFunctions.emplace_back(&DayHandler::Day21);
 	dayFunctions.emplace_back(&DayHandler::Day22);
+	dayFunctions.emplace_back(&DayHandler::Day23);
 	currentDay = dayFunctions.size();
 }
 
@@ -2366,6 +2367,34 @@ void DayHandler::Day22(FileHandler& fileHandler)
 	std::cout << "Part Two: " << count << std::endl;
 }
 
+void DayHandler::Day23(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day23.txt");
+	std::pair<int, int> start = { 1,0 }, end = { tab[0].length() - 2, tab.size() - 1 };
+	std::vector<std::vector<std::pair<int, int>>> paths = Day23GetAllPaths(tab, start, end);
+	long long maxSteps = 0;
+	int maxStepsIndex = 0;
+	for (int i = 0; i < paths.size(); i++)
+	{
+		if (paths[i].size() > maxSteps)
+		{
+			maxSteps = paths[i].size();
+			maxStepsIndex = i;
+		}
+	}
+	std::vector<std::string> map = tab;
+	for (const auto& tmp : paths[maxStepsIndex])
+		map[tmp.second][tmp.first] = 'O';
+	fileHandler.WriteFile("Day23Map.txt", map);
+
+	std::cout << "Part One: " << maxSteps - 1 << std::endl;
+
+	long long maxSteps1 = 0;
+	Day23MaxPathsSteps(tab, start, end, maxSteps1, true);
+
+	std::cout << "Part Two: " << maxSteps1 - 1 << std::endl;
+}
+
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const
 {
 	std::vector<std::pair<long long, long long>> tmp, tab1 = tab;
@@ -3014,4 +3043,80 @@ int DayHandler::Day22GenerateChainReaction(const std::vector<Brick>& bricks, int
 		}
 	}
 	return count;
+}
+
+std::vector<std::vector<std::pair<int, int>>> DayHandler::Day23GetAllPaths(const std::vector<std::string>& map, const std::pair<int, int>& start, const std::pair<int, int>& end, const bool canClimbSlopes, std::vector<std::pair<int, int>> currentPath)
+{
+	std::vector<std::vector<std::pair<int, int>>> paths;
+	currentPath.push_back(start);
+	while (currentPath.back() != end)
+	{
+		std::pair<int, int> currentLocation = currentPath.back();
+		std::vector<std::pair<int, int>> directions = { {0,1},{1,0},{0,-1},{-1,0} };
+		std::vector<std::pair<int, int>> nextLocations;
+		for (auto& direction : directions)
+		{
+			std::pair<int, int> nextLocation = { currentLocation.first + direction.first, currentLocation.second + direction.second };
+			if (0 <= nextLocation.second && nextLocation.second < map.size() && 0 <= nextLocation.first && nextLocation.first < map[0].length() && map[nextLocation.second][nextLocation.first] != '#' && std::find(currentPath.begin(), currentPath.end(), nextLocation) == currentPath.end())
+			{
+				char nextChar = map[nextLocation.second][nextLocation.first];
+				if (canClimbSlopes)
+					nextLocations.push_back(nextLocation);
+				else if (nextChar == '.' || nextChar == '>' && direction.first == 1 || nextChar == '<' && direction.first == -1 || nextChar == 'v' && direction.second == 1 || nextChar == '^' && direction.second == -1)
+					nextLocations.push_back(nextLocation);
+			}
+		}
+		if (nextLocations.size() >= 1)
+		{
+			for (int i = 1; i < nextLocations.size(); i++)
+			{
+				std::vector<std::vector<std::pair<int, int>>> tmpPaths = Day23GetAllPaths(map, nextLocations[i], end, canClimbSlopes, currentPath);
+				paths.insert(paths.end(), tmpPaths.begin(), tmpPaths.end());
+			}
+			currentPath.push_back(nextLocations[0]);
+		}
+		else
+		{
+			return paths;
+		}
+	}
+	paths.push_back(currentPath);
+	return paths;
+}
+
+void DayHandler::Day23MaxPathsSteps(const std::vector<std::string>& map, const std::pair<int, int>& start, const std::pair<int, int>& end, long long& maxSteps, const bool canClimbSlopes, std::unordered_set<std::pair<int, int>, pair_hash> currentPath)
+{
+	currentPath.insert(start);
+	std::pair<int, int> currentLocation = start;
+	while (currentLocation != end)
+	{
+		std::vector<std::pair<int, int>> directions = { {0,1},{1,0},{0,-1},{-1,0} };
+		std::vector<std::pair<int, int>> nextLocations;
+		for (auto& direction : directions)
+		{
+			std::pair<int, int> nextLocation = { currentLocation.first + direction.first, currentLocation.second + direction.second };
+			if (0 <= nextLocation.second && nextLocation.second < map.size() && 0 <= nextLocation.first && nextLocation.first < map[0].length() && map[nextLocation.second][nextLocation.first] != '#' && currentPath.find(nextLocation) == currentPath.end())
+			{
+				char nextChar = map[nextLocation.second][nextLocation.first];
+				if (canClimbSlopes)
+					nextLocations.emplace_back(nextLocation);
+				else if (nextChar == '.' || nextChar == '>' && direction.first == 1 || nextChar == '<' && direction.first == -1 || nextChar == 'v' && direction.second == 1 || nextChar == '^' && direction.second == -1)
+					nextLocations.emplace_back(nextLocation);
+			}
+		}
+		if (nextLocations.size() >= 1)
+		{
+			for (int i = 1; i < nextLocations.size(); i++)
+				Day23MaxPathsSteps(map, nextLocations[i], end, maxSteps, canClimbSlopes, currentPath);
+			currentLocation = nextLocations[0];
+			currentPath.insert(currentLocation);
+		}
+		else
+		{
+			return;
+		}
+	}
+	if (currentPath.size() > maxSteps)
+		maxSteps = currentPath.size();
+	std::cout << "Curr max: " << maxSteps << "\r";
 }

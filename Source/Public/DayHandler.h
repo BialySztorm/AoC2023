@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 class FileHandler;
 
@@ -74,14 +75,25 @@ private:
 		}
 	};
 
+	struct pair_hash {
+		template <class T1, class T2>
+		std::size_t operator () (const std::pair<T1, T2>& p) const {
+			auto h1 = std::hash<T1>{}(p.first);
+			auto h2 = std::hash<T2>{}(p.second);
+
+			// Mainly for demonstration purposes, i.e. works but is overly simple
+			// In the real world, use sth like boost.hash_combine
+			return h1 ^ h2;
+		}
+	};
+
 	std::vector<Brick> bricks;
+	std::unordered_map<std::tuple<long long, long long, long long>, long long, TupleHash> RP;
 	// private variables
 	int currentDay;
 	std::vector<void (DayHandler::*)(FileHandler&)> dayFunctions;
 	std::vector<std::string> dayNames;
 	FileHandler* fileHandler;
-
-	std::unordered_map<std::tuple<long long, long long, long long>, long long, TupleHash> RP;
 
 	// Main day functions
 	void Day1(FileHandler& fileHandler);
@@ -106,6 +118,7 @@ private:
 	void Day20(FileHandler& fileHandler);
 	void Day21(FileHandler& fileHandler);
 	void Day22(FileHandler& fileHandler);
+	void Day23(FileHandler& fileHandler);
 
 	// Additional day functions
 	std::vector<std::pair<long long, long long>> Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const;
@@ -118,4 +131,6 @@ private:
 	std::pair<long long, long long> Day20CountPulses(const std::unordered_map<std::string, std::pair<std::vector<std::string>, char>>& moduleConfiguration, std::unordered_map<std::string, bool> flipFlopPulses, std::unordered_map<std::string, std::unordered_map<std::string, bool>> conjuctionPulses, const long long& buttonRepeats = 1000, const bool& part2 = false);
 	void Day22PrintMap(const std::vector<Brick>& bricks, std::string filename = "Day22Map.txt") const;
 	int Day22GenerateChainReaction(const std::vector<Brick>& bricks, int currentBrick, std::vector<int>& fallen);
+	std::vector<std::vector<std::pair<int, int>>> Day23GetAllPaths(const std::vector<std::string>& map, const std::pair<int, int>& start, const std::pair<int, int>& end, const bool canClimbSlopes = false, std::vector<std::pair<int, int>> currentPath = {});
+	void Day23MaxPathsSteps(const std::vector<std::string>& map, const std::pair<int, int>& start, const std::pair<int, int>& end, long long& maxSteps, const bool canClimbSlopes = false, std::unordered_set<std::pair<int, int>, pair_hash> currentPath = {});
 };
