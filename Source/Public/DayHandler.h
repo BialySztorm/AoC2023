@@ -28,6 +28,54 @@ private:
 		char type;
 		std::vector<std::string> arguments;
 	};
+
+	struct Brick {
+		int id;
+		std::pair<int, int> x;
+		std::pair<int, int> y;
+		std::pair<int, int> z;
+		int xSize() const { return x.second - x.first + 1; }
+		int ySize() const { return y.second - y.first + 1; }
+		int zSize() const { return z.second - z.first + 1; }
+		std::vector<int> supportedBy = {};
+		std::vector<int> supports = {};
+		std::vector<std::tuple<int, int, int>> getBottomCoordinates() const
+		{
+			std::vector<std::tuple<int, int, int>> coordinates;
+			for (int i = x.first; i <= x.second; i++)
+				for (int j = y.first; j <= y.second; j++)
+					coordinates.push_back(std::make_tuple(i, j, z.first));
+			return coordinates;
+		}
+		std::vector<std::tuple<int, int, int>> getTopCoordinates() const
+		{
+			std::vector<std::tuple<int, int, int>> coordinates;
+			for (int i = x.first; i <= x.second; i++)
+				for (int j = y.first; j <= y.second; j++)
+					coordinates.push_back(std::make_tuple(i, j, z.second+1));
+			return coordinates;
+		}
+		std::vector<std::tuple<int, int, int>> getCoordinates() const
+		{
+			std::vector<std::tuple<int, int, int>> coordinates;
+			for (int i = x.first; i <= x.second; i++)
+				for (int j = y.first; j <= y.second; j++)
+					for (int k = z.first; k <= z.second; k++)
+						coordinates.push_back(std::make_tuple(i, j, k));
+			return coordinates;
+		}
+		bool moveDown()
+		{
+			if(z.first <= 1)
+				return false;
+			z.first--;
+			z.second--;
+			return true;
+		}
+
+	};
+
+	std::vector<Brick> bricks;
 	// private variables
 	int currentDay;
 	std::vector<void (DayHandler::*)(FileHandler&)> dayFunctions;
@@ -58,6 +106,7 @@ private:
 	void Day19(FileHandler& fileHandler);
 	void Day20(FileHandler& fileHandler);
 	void Day21(FileHandler& fileHandler);
+	void Day22(FileHandler& fileHandler);
 
 	// Additional day functions
 	std::vector<std::pair<long long, long long>> Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const;
@@ -68,4 +117,6 @@ private:
 	char Day19HandleInstructions(const std::unordered_map<std::string, std::vector<Instruction>>& worklows, const std::unordered_map<std::string, int>& part);
 	std::vector<std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, int>> >Day19GetAllRanges(const std::unordered_map<std::string, std::vector<Instruction>>& workflows, std::vector<Instruction> currentInstruction, std::unordered_map<std::string, int> min, std::unordered_map<std::string, int> max);
 	std::pair<long long, long long> Day20CountPulses(const std::unordered_map<std::string, std::pair<std::vector<std::string>, char>>& moduleConfiguration, std::unordered_map<std::string, bool> flipFlopPulses, std::unordered_map<std::string, std::unordered_map<std::string, bool>> conjuctionPulses, const long long& buttonRepeats = 1000, const bool& part2 = false);
+	void Day22PrintMap(const std::vector<Brick>& bricks, std::string filename = "Day22Map.txt") const;
+	int Day22GenerateChainReaction(const std::vector<Brick>& bricks, int currentBrick, std::vector<int>& fallen);
 };

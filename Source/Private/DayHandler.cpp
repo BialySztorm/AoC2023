@@ -37,6 +37,7 @@ DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day19);
 	dayFunctions.emplace_back(&DayHandler::Day20);
 	dayFunctions.emplace_back(&DayHandler::Day21);
+	dayFunctions.emplace_back(&DayHandler::Day22);
 	currentDay = dayFunctions.size();
 }
 
@@ -2261,6 +2262,110 @@ void DayHandler::Day21(FileHandler& fileHandler)
 	std::cout << "Part Two: " << ans << std::endl;
 }
 
+void DayHandler::Day22(FileHandler& fileHandler)
+{
+	std::vector< std::string> tab = fileHandler.ReadFile("day22.txt");
+	if(bricks.empty())
+	{
+	for (int i = 0; i < tab.size(); i++)
+	{
+		std::vector<int> tmp = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tab[i], { ',','~' }));
+		bricks.push_back({ i,{tmp[0],tmp[3]},{tmp[1],tmp[4]},{tmp[2],tmp[5]} });
+	}
+	Day22PrintMap(bricks);
+	
+	bool loopEnd = false;
+	int updatedZ = 0;
+	while (!loopEnd)
+	{
+		std::cout << updatedZ << "/500\r";
+		int tmpUpdatedZ = -1;
+		loopEnd = true;
+		for (Brick& brick : bricks)
+		{
+			bool brickCanMove = true;
+			if (brick.z.first <= 1)
+				continue;
+			if (updatedZ > brick.z.first)
+				continue;
+			for (const Brick& brick1 : bricks)
+			{
+				if (brick1.id == brick.id)
+					continue;
+				const std::vector<std::tuple<int, int, int>>& tmp = brick.getBottomCoordinates();
+				const std::vector<std::tuple<int, int, int>>& tmp1 = brick1.getTopCoordinates();
+				if (std::find_first_of(tmp.begin(), tmp.end(), tmp1.begin(), tmp1.end()) != tmp.end())
+				{
+					brickCanMove = false;
+					break;
+				}
+			}
+			if (brickCanMove)
+			{
+				if (!brick.moveDown())
+				{
+					loopEnd = true;
+					CustomLib::PushError("Brick " + std::to_string(brick.id) + " can't move down");
+					break;
+				}
+				loopEnd = false;
+				if (tmpUpdatedZ > brick.z.first || tmpUpdatedZ == -1)
+					tmpUpdatedZ = brick.z.first;
+			}
+		}
+		updatedZ = tmpUpdatedZ;
+	}
+	Day22PrintMap(bricks, "Day22Map1.txt");
+	for (auto& brick : bricks)
+	{
+		for (auto& brick1 : bricks)
+		{
+			if (brick.id == brick1.id)
+				continue;
+			const auto& tmp = brick.getTopCoordinates();
+			const auto& tmp1 = brick1.getBottomCoordinates();
+			if (std::find_first_of(tmp.begin(), tmp.end(), tmp1.begin(), tmp1.end()) != tmp.end())
+			{
+				brick.supports.push_back(brick1.id);
+				brick1.supportedBy.push_back(brick.id);
+			}
+		}
+	}
+	}
+	long long count = 0;
+	for (const auto& brick : bricks)
+	{
+		if (!brick.supports.size())
+			count++;
+		else
+		{
+			bool canBeDeleted = true;
+			for (const auto& tmp : brick.supports)
+			{
+				if (bricks[tmp].supportedBy.size() <= 1)
+				{
+					canBeDeleted = false;
+					break;
+				}
+			}
+			if (canBeDeleted)
+				count++;
+		}
+	}
+	std::cout << "Part One: " << count << std::endl;
+
+	count = 0;
+	for (const auto& brick : bricks)
+	{
+		for (const auto& tmp : brick.supports)
+		{
+			std::vector<int> tmp1 = { brick.id };
+			count += Day22GenerateChainReaction(bricks, tmp, tmp1);
+		}
+	}
+	std::cout<< "Part Two: " << count << std::endl;
+}
+
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const
 {
 	std::vector<std::pair<long long, long long>> tmp, tab1 = tab;
@@ -2829,4 +2934,84 @@ std::pair<long long, long long> DayHandler::Day20CountPulses(const std::unordere
 		//std::cout << pulsesCount.first << "," << pulsesCount.second << std::endl;
 	}
 	return pulsesCount;
+}
+
+void DayHandler::Day22PrintMap(const std::vector<Brick>& bricks, std::string filename) const
+{
+	int maxX = 0, maxY = 0, maxZ = 0;
+	for (const auto& brick : bricks)
+	{
+		if (brick.x.second > maxX)
+			maxX = brick.x.second;
+		if (brick.y.second > maxY)
+			maxY = brick.y.second;
+		if (brick.z.second > maxZ)
+			maxZ = brick.z.second;
+	}
+	std::vector<std::vector<int>> mapX = std::vector<std::vector<int>>(maxZ + 1, std::vector<int>(maxX + 1, 0));
+	std::vector<std::vector<int>> mapY = std::vector<std::vector<int>>(maxZ + 1, std::vector<int>(maxY + 1, 0));
+
+	for (const auto& brick : bricks)
+	{
+		for (const auto& tmp : brick.getCoordinates())
+		{
+			mapX[std::get<2>(tmp)][std::get<0>(tmp)]++;
+			mapY[std::get<2>(tmp)][std::get<1>(tmp)]++;
+		}
+	}
+
+	std::vector<std::string> map;
+	for (int i = 0; i < mapX.size(); i++)
+	{
+		std::string tmp = "";
+		for (int j = 0; j < mapX[i].size(); j++)
+		{
+			tmp += std::to_string(mapX[i][j]) + "\t";
+		}
+		tmp += "\t\t";
+		for (int j = 0; j < mapY[i].size(); j++)
+		{
+			tmp += std::to_string(mapY[i][j]) + "\t";
+		}
+		map.push_back(tmp);
+	}
+	std::reverse(map.begin(), map.end());
+
+	fileHandler->WriteFile(filename, map);
+}
+
+int DayHandler::Day22GenerateChainReaction(const std::vector<Brick>& bricks, int currentBrick, std::vector<int>& fallen)
+{
+	int count = 0;
+	if (bricks[currentBrick].supportedBy.size() == 1 && std::find(fallen.begin(),fallen.end(),currentBrick) == fallen.end())
+	{
+		count++;
+		fallen.push_back(currentBrick);
+		for (const auto& tmp : bricks[currentBrick].supports)
+		{
+			count += Day22GenerateChainReaction(bricks, tmp, fallen);
+		}
+	}
+	else if (bricks[currentBrick].supportedBy.size() > 1)
+	{
+		bool isGonnaFall = true;
+		for (const auto& tmp : bricks[currentBrick].supportedBy)
+		{
+			if (std::find(fallen.begin(), fallen.end(), tmp) == fallen.end())
+			{
+				isGonnaFall = false;
+				break;
+			}
+		}
+		if(isGonnaFall)
+		{
+			count ++;
+			fallen.push_back(currentBrick);
+			for (const auto& tmp : bricks[currentBrick].supports)
+			{
+				count += Day22GenerateChainReaction(bricks, tmp, fallen);
+			}
+		}
+	}
+	return count;
 }
