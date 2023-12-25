@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <queue>
 #include <algorithm>
+#include <z3++.h>
 #include "CustomLib.h"
 #include "FileHandler.h"
 
@@ -39,6 +40,7 @@ DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day21);
 	dayFunctions.emplace_back(&DayHandler::Day22);
 	dayFunctions.emplace_back(&DayHandler::Day23);
+	dayFunctions.emplace_back(&DayHandler::Day24);
 	currentDay = dayFunctions.size();
 }
 
@@ -2393,6 +2395,52 @@ void DayHandler::Day23(FileHandler& fileHandler)
 	Day23MaxPathsSteps(tab, start, end, maxSteps1, true);
 
 	std::cout << "Part Two: " << maxSteps1 - 1 << std::endl;
+}
+
+void DayHandler::Day24(FileHandler& fileHandler)
+{
+	std::vector<std::string> tab = fileHandler.ReadFile("day24.txt");
+	std::vector<HailStone> hailStones;
+	for (const auto& line : tab)
+	{
+		hailStones.push_back(HailStone(CustomLib::VectorStringToNumber<long double>(CustomLib::SplitString(line, { '@',',',' ' }))));
+	}
+	long long count = 0;
+	//long double min = 7, max = 27;
+	long double min = 200000000000000, max = 400000000000000;
+	for (int i = 0; i < hailStones.size() - 1; i++)
+		for (int j = i + 1; j < hailStones.size(); j++)
+			if (hailStones[i].WillIntersect2D({ hailStones[j] }, min, max))
+				count++;
+
+	std::cout << "Part One: " << count << std::endl;
+
+	z3::context c;
+	z3::solver solve(c);
+
+	z3::expr x = c.real_const("x");
+	z3::expr y = c.real_const("y");
+	z3::expr z = c.real_const("z");
+	z3::expr vx = c.real_const("vx");
+	z3::expr vy = c.real_const("vy");
+	z3::expr vz = c.real_const("vz");
+
+	int n = hailStones.size();
+	std::vector<z3::expr> T;
+
+	for (int i = 0; i < n; i++)
+		T.push_back(c.real_const(("T" + std::to_string(i)).c_str()));
+
+	for (int i = 0; i < n; i++) {
+		solve.add(x + T[i] * vx - c.real_val((long long)hailStones[i].x) - T[i] * c.real_val((long long)hailStones[i].vx) == 0);
+		solve.add(y + T[i] * vy - c.real_val((long long)hailStones[i].y) - T[i] * c.real_val((long long)hailStones[i].vy) == 0);
+		solve.add(z + T[i] * vz - c.real_val((long long)hailStones[i].z) - T[i] * c.real_val((long long)hailStones[i].vz) == 0);
+	}
+
+	if (solve.check() == z3::sat) {
+		z3::model m = solve.get_model();
+		std::cout << "Part Two: " << m.eval(x + y + z).get_numeral_int64() << std::endl;
+	}
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const

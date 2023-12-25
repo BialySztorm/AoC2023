@@ -87,6 +87,27 @@ private:
 		}
 	};
 
+	struct HailStone {
+		long double x, y, z, vx, vy, vz;
+		HailStone(std::vector<long double> tab) : x(tab[0]), y(tab[1]), z(tab[2]), vx(tab[3]), vy(tab[4]), vz(tab[5]) {}
+
+		bool WillIntersect2D(const HailStone& other, const long double& min, const long double& max) const
+		{
+			if (vx == other.vx && vy == other.vy)
+				return (x == other.x && y == other.y); // Linie s¹ identyczne, sprawdzamy, czy siê nak³adaj¹
+			else
+			{
+				long double t = (vx * (other.y - y) + vy * (x - other.x)) / (other.vx * vy - other.vy * vx);
+				long double u = (other.x + t * other.vx - x) / vx;
+				long double x1 = x + vx * u;
+				long double y1 = y + vy * u;
+				if (x1 < min || x1 > max || y1 < min || y1 > max)
+					return false;
+				return (t >= 0 && u >= 0);
+			}
+		}
+	};
+
 	std::vector<Brick> bricks;
 	std::unordered_map<std::tuple<long long, long long, long long>, long long, TupleHash> RP;
 	// private variables
@@ -119,6 +140,7 @@ private:
 	void Day21(FileHandler& fileHandler);
 	void Day22(FileHandler& fileHandler);
 	void Day23(FileHandler& fileHandler);
+	void Day24(FileHandler& fileHandler);
 
 	// Additional day functions
 	std::vector<std::pair<long long, long long>> Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const;
