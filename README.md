@@ -1,11 +1,10 @@
 # AoC2023
  Advent of Code 2023
 
-
-![image](https://github.com/BialySztorm/AoC2023/assets/70662105/865a32ee-0c27-46b9-8487-d235c413f6ce)
-
+![image](https://github.com/BialySztorm/AoC2023/assets/70662105/df638ffe-d979-4b7e-9819-c7134347fe1f)
 
 AoC Times:
 
-![image](https://github.com/BialySztorm/AoC2023/assets/70662105/e575b410-8410-4f46-ab67-673c8d403533)
+![image](https://github.com/BialySztorm/AoC2023/assets/70662105/95e55234-524b-4958-ab73-7cc7ff8d8c2e)
+
 
