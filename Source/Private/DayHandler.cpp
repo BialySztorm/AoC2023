@@ -41,6 +41,7 @@ DayHandler::DayHandler(const std::string inputDir, const std::string outputDir)
 	dayFunctions.emplace_back(&DayHandler::Day22);
 	dayFunctions.emplace_back(&DayHandler::Day23);
 	dayFunctions.emplace_back(&DayHandler::Day24);
+	dayFunctions.emplace_back(&DayHandler::Day25);
 	currentDay = dayFunctions.size();
 }
 
@@ -2441,6 +2442,11 @@ void DayHandler::Day24(FileHandler& fileHandler)
 		z3::model m = solve.get_model();
 		std::cout << "Part Two: " << m.eval(x + y + z).get_numeral_int64() << std::endl;
 	}
+}
+
+void DayHandler::Day25(FileHandler& fileHandler)
+{
+	system("python day25.py Data/Input/day25.txt Data/Output/Day25Map.png");
 }
 
 std::vector<std::pair<long long, long long>> DayHandler::Day5ApplyRange(const std::vector<std::pair<long long, long long>> tab, const std::vector<std::vector<long long>> mapping) const

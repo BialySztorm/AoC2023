@@ -65,5 +65,8 @@
     <None Include="Data\Input\names.json">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="Day25.py">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
