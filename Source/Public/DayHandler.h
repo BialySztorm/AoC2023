@@ -107,8 +107,6 @@ private:
 			}
 		}
 	};
-
-	std::vector<Brick> bricks;
 	std::unordered_map<std::tuple<long long, long long, long long>, long long, TupleHash> RP;
 	// private variables
 	int currentDay;

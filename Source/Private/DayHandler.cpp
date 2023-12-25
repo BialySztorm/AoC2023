@@ -4,7 +4,6 @@
 #include <iostream>
 #include <cmath>
 #include <thread>
-#include <numeric>
 #include <limits>
 #include <unordered_map>
 #include <queue>
@@ -1148,7 +1147,10 @@ void DayHandler::Day11(FileHandler& fileHandler)
 	std::cout << "Part One: " << distanceSum << std::endl;
 	// get distance between all galaxies
 	distanceSum = 0;
-	multiplayer = 1000000;
+	if(tab.size() > 20)
+		multiplayer = 1000000;
+	else
+		multiplayer = 100;
 	for (int i = 0; i < galaxies.size() - 1; i++)
 	{
 		std::cout << i << "/" << tabSize << "\r";
@@ -1896,11 +1898,11 @@ void DayHandler::Day18(FileHandler& fileHandler)
 			}
 		}
 	}
-	/*std::cout << "Generating map..." << std::endl;
+	std::cout << "Generating map..." << std::endl;
 	if (fileHandler.WriteFile("Day18Map.txt", map))
 		std::cout << "Map generated properly to file Day18Map.txt" << std::endl;
 	else
-		std::cout << "Map generation failed" << std::endl;*/
+		std::cout << "Map generation failed" << std::endl;
 
 	std::vector<std::vector<char>> map1 = map;
 	{
@@ -1945,11 +1947,11 @@ void DayHandler::Day18(FileHandler& fileHandler)
 		}
 	}
 
-	/*std::cout << "Generating map..." << std::endl;
+	std::cout << "Generating map..." << std::endl;
 	if (fileHandler.WriteFile("Day18Map1.txt", map1))
 		std::cout << "Map generated properly to file Day18Map1.txt" << std::endl;
 	else
-		std::cout << "Map generation failed" << std::endl;*/
+		std::cout << "Map generation failed" << std::endl;
 
 	long long count = 0;
 	for (std::vector<char> line : map1)
@@ -2116,7 +2118,10 @@ void DayHandler::Day21(FileHandler& fileHandler)
 				steps.push_back({ j,i });
 				break;
 			}
-	for (int i = 0; i < 64; i++)
+	int stepsAmount = 64;
+	if(tab.size()< 15)
+		stepsAmount = 6;
+	for (int i = 0; i < stepsAmount; i++)
 	{
 		std::cout << i << "/64\r";
 		std::vector<std::pair<int, int>> tmp;
@@ -2203,13 +2208,15 @@ void DayHandler::Day21(FileHandler& fileHandler)
 	}
 
 	long long limit = 26501365;
+	if (tab.size() < 15)
+		limit = 5000;
 	long long ans = 0;
 	std::map<std::string, long long> solveMap;
 	for (int y = 0; y < ySize; y++)
 	{
 		for (int x = 0; x < xSize; x++)
 		{
-			std::cout << y << "/" << ySize << ", " << x << "/" << xSize << "\r";
+			std::cout << y << "/" << ySize << ", " << x << "/" << xSize << " \r";
 			std::cout.flush();
 			std::string key = "0,0," + std::to_string(y) + "," + std::to_string(x);
 			if (distanceMap.find(key) != distanceMap.end())
@@ -2269,70 +2276,68 @@ void DayHandler::Day21(FileHandler& fileHandler)
 void DayHandler::Day22(FileHandler& fileHandler)
 {
 	std::vector< std::string> tab = fileHandler.ReadFile("day22.txt");
-	if (bricks.empty())
+	std::vector<Brick> bricks;
+	for (int i = 0; i < tab.size(); i++)
 	{
-		for (int i = 0; i < tab.size(); i++)
-		{
-			std::vector<int> tmp = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tab[i], { ',','~' }));
-			bricks.push_back({ i,{tmp[0],tmp[3]},{tmp[1],tmp[4]},{tmp[2],tmp[5]} });
-		}
-		Day22PrintMap(bricks);
+		std::vector<int> tmp = CustomLib::VectorStringToNumber<int>(CustomLib::SplitString(tab[i], { ',','~' }));
+		bricks.push_back({ i,{tmp[0],tmp[3]},{tmp[1],tmp[4]},{tmp[2],tmp[5]} });
+	}
+	Day22PrintMap(bricks);
 
-		bool loopEnd = false;
-		int updatedZ = 0;
-		while (!loopEnd)
+	bool loopEnd = false;
+	int updatedZ = 0;
+	while (!loopEnd)
+	{
+		std::cout << updatedZ << "/500\r";
+		int tmpUpdatedZ = -1;
+		loopEnd = true;
+		for (Brick& brick : bricks)
 		{
-			std::cout << updatedZ << "/500\r";
-			int tmpUpdatedZ = -1;
-			loopEnd = true;
-			for (Brick& brick : bricks)
+			bool brickCanMove = true;
+			if (brick.z.first <= 1)
+				continue;
+			if (updatedZ > brick.z.first)
+				continue;
+			for (const Brick& brick1 : bricks)
 			{
-				bool brickCanMove = true;
-				if (brick.z.first <= 1)
+				if (brick1.id == brick.id)
 					continue;
-				if (updatedZ > brick.z.first)
-					continue;
-				for (const Brick& brick1 : bricks)
-				{
-					if (brick1.id == brick.id)
-						continue;
-					const std::vector<std::tuple<int, int, int>>& tmp = brick.getBottomCoordinates();
-					const std::vector<std::tuple<int, int, int>>& tmp1 = brick1.getTopCoordinates();
-					if (std::find_first_of(tmp.begin(), tmp.end(), tmp1.begin(), tmp1.end()) != tmp.end())
-					{
-						brickCanMove = false;
-						break;
-					}
-				}
-				if (brickCanMove)
-				{
-					if (!brick.moveDown())
-					{
-						loopEnd = true;
-						CustomLib::PushError("Brick " + std::to_string(brick.id) + " can't move down");
-						break;
-					}
-					loopEnd = false;
-					if (tmpUpdatedZ > brick.z.first || tmpUpdatedZ == -1)
-						tmpUpdatedZ = brick.z.first;
-				}
-			}
-			updatedZ = tmpUpdatedZ;
-		}
-		Day22PrintMap(bricks, "Day22Map1.txt");
-		for (auto& brick : bricks)
-		{
-			for (auto& brick1 : bricks)
-			{
-				if (brick.id == brick1.id)
-					continue;
-				const auto& tmp = brick.getTopCoordinates();
-				const auto& tmp1 = brick1.getBottomCoordinates();
+				const std::vector<std::tuple<int, int, int>>& tmp = brick.getBottomCoordinates();
+				const std::vector<std::tuple<int, int, int>>& tmp1 = brick1.getTopCoordinates();
 				if (std::find_first_of(tmp.begin(), tmp.end(), tmp1.begin(), tmp1.end()) != tmp.end())
 				{
-					brick.supports.push_back(brick1.id);
-					brick1.supportedBy.push_back(brick.id);
+					brickCanMove = false;
+					break;
 				}
+			}
+			if (brickCanMove)
+			{
+				if (!brick.moveDown())
+				{
+					loopEnd = true;
+					CustomLib::PushError("Brick " + std::to_string(brick.id) + " can't move down");
+					break;
+				}
+				loopEnd = false;
+				if (tmpUpdatedZ > brick.z.first || tmpUpdatedZ == -1)
+					tmpUpdatedZ = brick.z.first;
+			}
+		}
+		updatedZ = tmpUpdatedZ;
+	}
+	Day22PrintMap(bricks, "Day22Map1.txt");
+	for (auto& brick : bricks)
+	{
+		for (auto& brick1 : bricks)
+		{
+			if (brick.id == brick1.id)
+				continue;
+			const auto& tmp = brick.getTopCoordinates();
+			const auto& tmp1 = brick1.getBottomCoordinates();
+			if (std::find_first_of(tmp.begin(), tmp.end(), tmp1.begin(), tmp1.end()) != tmp.end())
+			{
+				brick.supports.push_back(brick1.id);
+				brick1.supportedBy.push_back(brick.id);
 			}
 		}
 	}
@@ -2407,8 +2412,12 @@ void DayHandler::Day24(FileHandler& fileHandler)
 		hailStones.push_back(HailStone(CustomLib::VectorStringToNumber<long double>(CustomLib::SplitString(line, { '@',',',' ' }))));
 	}
 	long long count = 0;
-	//long double min = 7, max = 27;
 	long double min = 200000000000000, max = 400000000000000;
+	if(tab.size() < 10)
+	{
+		min = 7;
+		max = 27;
+	}
 	for (int i = 0; i < hailStones.size() - 1; i++)
 		for (int j = i + 1; j < hailStones.size(); j++)
 			if (hailStones[i].WillIntersect2D({ hailStones[j] }, min, max))
